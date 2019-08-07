@@ -5,6 +5,7 @@ set_time_limit(0);
 require dirname(__FILE__).'/../src/bootstrap.php';
 
 use Symfony\Component\Console\Application;
+use Eccube2\Command\InfoCommand;
 use Eccube2\Command\ModuleListCommand;
 use Eccube2\Command\ModuleInfoCommand;
 use Eccube2\Command\ModuleInstallCommand;
@@ -20,6 +21,7 @@ use Eccube2\Command\PluginDisableCommand;
 
 $app = new Application();
 $app->addCommands(array(
+    new InfoCommand(),
     new ModuleListCommand(),
     new ModuleInfoCommand(),
     new ModuleInstallCommand(),

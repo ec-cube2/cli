@@ -39,8 +39,6 @@ class InfoCommand extends BasePluginCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-
         $io = new SymfonyStyle($input, $output);
         $io->title('EC-CUBE情報');
 
@@ -65,6 +63,7 @@ class InfoCommand extends BasePluginCommand
         $io->section('マシン型');
         $io->text(php_uname('m'));
 
+
         $io->title('PHP情報');
 
         $io->section('PHPバージョン');
@@ -72,6 +71,7 @@ class InfoCommand extends BasePluginCommand
 
         $io->section('PHPモジュール');
         $io->listing($this->getPHPModule());
+
 
         $io->title('DB情報');
 
