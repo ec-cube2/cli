@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginEnableCommand extends BasePluginCommand
 {
-    protected static $name = 'plugin:enable';
+    public static $defaultName = 'plugin:enable';
 
     protected function configure()
     {

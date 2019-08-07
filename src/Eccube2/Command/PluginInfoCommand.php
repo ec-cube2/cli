@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginInfoCommand extends BasePluginCommand
 {
-    protected static $name = 'plugin:info';
+    public static $defaultName = 'plugin:info';
 
     protected function configure()
     {

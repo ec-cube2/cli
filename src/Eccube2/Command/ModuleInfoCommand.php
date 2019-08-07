@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleInfoCommand extends BaseModuleCommand
 {
-    protected static $name = 'module:info';
+    public static $defaultName = 'module:info';
 
     protected function configure()
     {

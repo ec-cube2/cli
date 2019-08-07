@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginInstallCommand extends BasePluginCommand
 {
-    protected static $name = 'plugin:install';
+    public static $defaultName = 'plugin:install';
 
     protected function configure()
     {

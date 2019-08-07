@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginUpdateCommand extends BasePluginCommand
 {
-    protected static $name = 'plugin:update';
+    public static $defaultName = 'plugin:update';
 
     protected function configure()
     {
