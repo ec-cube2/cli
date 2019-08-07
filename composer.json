@@ -18,5 +18,8 @@
     "require-dev": {
         "composer/composer": "^1.0",
         "eccube2/eccube2": "^2.13"
-    }
+    },
+    "bin": [
+        "bin/eccube"
+    ]
 }
