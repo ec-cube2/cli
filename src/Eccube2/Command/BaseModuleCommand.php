@@ -21,6 +21,8 @@ abstract class BaseModuleCommand extends Command
 {
     protected $moduleDir;
 
+    protected $configUrlBase;
+
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         $baseDir = __DIR__.'/../../../../../../';
@@ -31,6 +33,7 @@ abstract class BaseModuleCommand extends Command
         }
 
         $this->moduleDir = rtrim(MODULE_REALDIR, '/');
+        $this->configUrlBase = HTTPS_URL.ADMIN_DIR.'load_module_config.php?module_id=';
     }
 
     public function isInstalled($code)
@@ -80,6 +83,9 @@ abstract class BaseModuleCommand extends Command
         $io->section('Name');
         $io->text($module['module_name']);
 
+        $io->section('Config Url');
+        $io->text($this->configUrlBase.$module['module_id']);
+
         $io->section('Create Date');
         $io->text($module['create_date']);
 
@@ -102,7 +108,7 @@ abstract class BaseModuleCommand extends Command
             $module_id = $this->updateEccubeModule($code);
         }
         $output->writeln('    <info>モジュールをインストールしました.</info>');
-        $output->writeln('    <info>'.HTTPS_URL.ADMIN_DIR.'load_module_config.php?module_id='.$module_id.' から設定してください</info>');
+        $output->writeln('    <info>'.$this->configUrlBase.$module_id.' から設定してください</info>');
     }
 
     /**
@@ -114,7 +120,7 @@ abstract class BaseModuleCommand extends Command
 
         $module_id = $this->updateEccubeModule($code);
         $output->writeln('    <info>モジュールをアップデートしました.</info>');
-        $output->writeln('    <info>'.HTTPS_URL.ADMIN_DIR.'load_module_config.php?module_id='.$module_id.' から設定してください</info>');
+        $output->writeln('    <info>'.$this->configUrlBase.$module_id.' から設定してください</info>');
     }
 
     /**
