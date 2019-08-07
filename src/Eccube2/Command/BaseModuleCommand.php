@@ -48,7 +48,7 @@ abstract class BaseModuleCommand extends Command
         foreach ($modules as $module) {
             $rows[] = array(
                 $module['module_code'],
-                $module['module_name'],
+                mb_strimwidth($module['module_name'], 0, 35, '...'),
             );
         }
 

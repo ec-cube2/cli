@@ -58,8 +58,8 @@ abstract class BasePluginCommand extends Command
         $rows = array();
         foreach ($plugins as $plugin) {
             $rows[] = array(
-                $plugin['plugin_name'],
                 $plugin['plugin_code'],
+                mb_strimwidth($plugin['plugin_name'], 0, 35, '...'),
                 $plugin['enable'] ? 'o' : 'x',
             );
         }
