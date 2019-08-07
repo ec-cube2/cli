@@ -11,11 +11,11 @@
 
 namespace Eccube2\Command;
 
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class PluginListCommand extends BasePluginCommand
+class PluginListCommand extends Command
 {
     protected static $defaultName = 'plugin:list';
 
