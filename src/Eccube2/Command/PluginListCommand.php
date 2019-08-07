@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginListCommand extends BasePluginCommand
 {
-    protected static $defaultName = 'plugin:list';
+    protected static $name = 'plugin:list';
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {

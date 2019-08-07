@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleUpdateCommand extends BaseModuleCommand
 {
-    protected static $defaultName = 'module:update';
+    protected static $name = 'module:update';
 
     protected function configure()
     {

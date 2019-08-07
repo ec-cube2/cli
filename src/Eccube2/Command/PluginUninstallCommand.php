@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginUninstallCommand extends BasePluginCommand
 {
-    protected static $defaultName = 'plugin:uninstall';
+    protected static $name = 'plugin:uninstall';
 
     protected function configure()
     {

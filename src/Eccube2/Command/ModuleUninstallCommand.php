@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleUninstallCommand extends BaseModuleCommand
 {
-    protected static $defaultName = 'module:uninstall';
+    protected static $name = 'module:uninstall';
 
     protected function configure()
     {

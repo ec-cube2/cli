@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleInstallCommand extends BaseModuleCommand
 {
-    protected static $defaultName = 'module:install';
+    protected static $name = 'module:install';
 
     protected function configure()
     {

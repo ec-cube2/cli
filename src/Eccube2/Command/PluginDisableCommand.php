@@ -17,7 +17,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginDisableCommand extends BasePluginCommand
 {
-    protected static $defaultName = 'plugin:disable';
+    protected static $name = 'plugin:disable';
 
     protected function configure()
     {
