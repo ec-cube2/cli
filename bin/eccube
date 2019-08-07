@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+set_time_limit(0);
+
+require dirname(__FILE__).'/../src/bootstrap.php';
+
+use Symfony\Component\Console\Application;
+use Eccube2\Command\ModuleListCommand;
+use Eccube2\Command\ModuleInstallCommand;
+use Eccube2\Command\ModuleUpdateCommand;
+use Eccube2\Command\ModuleUninstallCommand;
+use Eccube2\Command\PluginListCommand;
+use Eccube2\Command\PluginInstallCommand;
+use Eccube2\Command\PluginUpdateCommand;
+use Eccube2\Command\PluginUninstallCommand;
+use Eccube2\Command\PluginEnableCommand;
+use Eccube2\Command\PluginDisableCommand;
+
+$app = new Application();
+$app->addCommands(array(
+    new ModuleListCommand(),
+    new ModuleInstallCommand(),
+    new ModuleUpdateCommand(),
+    new ModuleUninstallCommand(),
+    new PluginListCommand(),
+    new PluginInstallCommand(),
+    new PluginUpdateCommand(),
+    new PluginUninstallCommand(),
+    new PluginEnableCommand(),
+    new PluginDisableCommand(),
+));
+$app->run();

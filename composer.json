@@ -1,0 +1,22 @@
+{
+    "name": "eccube2/cli",
+    "description": "EC-CUBE2 Command.",
+    "type": "library",
+    "license": "LGPL-3.0",
+    "authors": [
+        {
+            "name": "Tsuyoshi Tsurushima"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"Eccube2\\": "src/Eccube2/"}
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "symfony/console": "^2.7 || ^3.0 || ^4.0"
+    },
+    "require-dev": {
+        "composer/composer": "^1.0",
+        "eccube2/eccube2": "^2.13"
+    }
+}
