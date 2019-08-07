@@ -67,6 +67,8 @@ abstract class BasePluginCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('プラグイン一覧');
         $io->table(array('Code', 'Name', 'Enable'), $rows);
+
+        $io->newLine();
     }
 
     public function info(InputInterface $input, OutputInterface $output)
@@ -134,6 +136,9 @@ abstract class BasePluginCommand extends Command
 
         $io->section('Update Date');
         $io->text($plugin['update_date']);
+
+
+        $io->newLine();
     }
 
     /**

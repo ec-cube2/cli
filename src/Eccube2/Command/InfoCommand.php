@@ -77,6 +77,8 @@ class InfoCommand extends BasePluginCommand
 
         $io->section('DBバージョン');
         $io->text($this->getDBVersion());
+
+        $io->newLine();
     }
 
     private function getDBVersion()
@@ -88,7 +90,7 @@ class InfoCommand extends BasePluginCommand
 
     private function getPHPVersion()
     {
-        return 'PHP ' . phpversion();
+        return phpversion();
     }
 
     private function getPHPModule()

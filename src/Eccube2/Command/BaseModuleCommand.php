@@ -55,6 +55,8 @@ abstract class BaseModuleCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('モジュール一覧');
         $io->table(array('Code', 'Name'), $rows);
+
+        $io->newLine();
     }
 
     public function info(InputInterface $input, OutputInterface $output)
@@ -83,6 +85,8 @@ abstract class BaseModuleCommand extends Command
 
         $io->section('Update Date');
         $io->text($module['update_date']);
+
+        $io->newLine();
     }
 
     /**
