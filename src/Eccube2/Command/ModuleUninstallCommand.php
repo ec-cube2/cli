@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleUninstallCommand extends BaseModuleCommand
 {
-    public static $defaultName = 'module:uninstall';
+    protected static $defaultName = 'module:uninstall';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('module_name', InputArgument::REQUIRED, 'モジュール名')
         ;
     }

@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginEnableCommand extends BasePluginCommand
 {
-    public static $defaultName = 'plugin:enable';
+    protected static $defaultName = 'plugin:enable';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('plugin_name', InputArgument::REQUIRED, 'プラグイン名')
         ;
     }

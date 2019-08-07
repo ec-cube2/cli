@@ -17,7 +17,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleListCommand extends BaseModuleCommand
 {
-    public static $defaultName = 'module:list';
+    protected static $defaultName = 'module:list';
+
+    protected function configure()
+    {
+        $this
+            ->setName(static::$defaultName)
+        ;
+    }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {

@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class PluginInfoCommand extends BasePluginCommand
 {
-    public static $defaultName = 'plugin:info';
+    protected static $defaultName = 'plugin:info';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('plugin_name', InputArgument::REQUIRED, 'プラグイン名')
         ;
     }

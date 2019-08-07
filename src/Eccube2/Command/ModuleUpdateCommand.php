@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleUpdateCommand extends BaseModuleCommand
 {
-    public static $defaultName = 'module:update';
+    protected static $defaultName = 'module:update';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('module_name', InputArgument::REQUIRED, 'モジュール名')
         ;
     }

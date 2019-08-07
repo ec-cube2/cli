@@ -18,15 +18,15 @@ use Eccube2\Command\PluginDisableCommand;
 
 $app = new Application();
 $app->addCommands(array(
-    new ModuleListCommand(ModuleListCommand::$defaultName),
-    new ModuleInstallCommand(ModuleInstallCommand::$defaultName),
-    new ModuleUpdateCommand(ModuleUpdateCommand::$defaultName),
-    new ModuleUninstallCommand(ModuleUninstallCommand::$defaultName),
-    new PluginListCommand(PluginListCommand::$defaultName),
-    new PluginInstallCommand(PluginInstallCommand::$defaultName),
-    new PluginUpdateCommand(PluginUpdateCommand::$defaultName),
-    new PluginUninstallCommand(PluginUninstallCommand::$defaultName),
-    new PluginEnableCommand(PluginEnableCommand::$defaultName),
-    new PluginDisableCommand(PluginDisableCommand::$defaultName),
+    new ModuleListCommand(),
+    new ModuleInstallCommand(),
+    new ModuleUpdateCommand(),
+    new ModuleUninstallCommand(),
+    new PluginListCommand(),
+    new PluginInstallCommand(),
+    new PluginUpdateCommand(),
+    new PluginUninstallCommand(),
+    new PluginEnableCommand(),
+    new PluginDisableCommand(),
 ));
 $app->run();

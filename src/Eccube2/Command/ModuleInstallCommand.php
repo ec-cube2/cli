@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleInstallCommand extends BaseModuleCommand
 {
-    public static $defaultName = 'module:install';
+    protected static $defaultName = 'module:install';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('module_name', InputArgument::REQUIRED, 'モジュール名')
         ;
     }

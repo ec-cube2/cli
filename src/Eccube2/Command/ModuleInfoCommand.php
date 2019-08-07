@@ -17,11 +17,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ModuleInfoCommand extends BaseModuleCommand
 {
-    public static $defaultName = 'module:info';
+    protected static $defaultName = 'module:info';
 
     protected function configure()
     {
         $this
+            ->setName(static::$defaultName)
             ->addArgument('module_name', InputArgument::REQUIRED, 'モジュール名')
         ;
     }
