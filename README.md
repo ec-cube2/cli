@@ -6,7 +6,7 @@ EC-CUBE2 を CLI で管理できるようになります。
 ## Installation / Usage
 
 ```
-$ composer install eccube2/cli
+$ composer install ec-cube2/cli
 ```
 
 ```
