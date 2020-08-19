@@ -41,6 +41,11 @@ Available commands:
   template:pc:set          PCテンプレートコード設定
   template:smartphone:get  スマートフォンテンプレートコード表示
   template:smartphone:set  スマートフォンテンプレートコード設定
+ zip
+  zip:delete               郵便番号データ削除
+  zip:download             郵便番号CSVダウンロード
+  zip:info                 郵便番号情報
+  zip:update               郵便番号更新
 ```
 
 ```
