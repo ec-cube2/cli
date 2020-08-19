@@ -15,12 +15,17 @@ Available commands:
   help              Displays help for a command
   list              Lists commands
   info              EC-CUBE情報
+ cache
+  cache:clear       キャッシュクリア
  module
   module:list       モジュール一覧
   module:info       モジュール情報
   module:install    モジュールインストール
   module:uninstall  モジュールアンインストール
   module:update     モジュールアップデート
+ parameter
+  parameter:get     パラメーター表示
+  parameter:set     パラメーター設定
  plugin
   plugin:list       プラグイン一覧
   plugin:info       プラグイン情報
@@ -29,6 +34,13 @@ Available commands:
   plugin:enable     プラグイン有効化
   plugin:disable    プラグイン無効化
   plugin:update     プラグインアップデート
+ template
+  template:mobile:get      モバイルテンプレートコード表示
+  template:mobile:set      モバイルテンプレートコード設定
+  template:pc:get          PCテンプレートコード表示
+  template:pc:set          PCテンプレートコード設定
+  template:smartphone:get  スマートフォンテンプレートコード表示
+  template:smartphone:set  スマートフォンテンプレートコード設定
 ```
 
 ```
@@ -43,6 +55,12 @@ $ ./vendor/bin/eccube module:install mdl_name
 
 PHP 5.3.3 以上
 
+
+## Info
+
+それぞれのコマンドが利用する機能は `Eccube2\Util` にまとめています。
+
+追加機能の要望やバグ報告は Issue からお願いします。
 
 
 ## Author

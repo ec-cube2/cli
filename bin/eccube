@@ -6,33 +6,40 @@ require dirname(__FILE__).'/../src/bootstrap.php';
 
 use Symfony\Component\Console\Application;
 use Eccube2\Command\InfoCommand;
-use Eccube2\Command\ModuleListCommand;
-use Eccube2\Command\ModuleInfoCommand;
-use Eccube2\Command\ModuleInstallCommand;
-use Eccube2\Command\ModuleUpdateCommand;
-use Eccube2\Command\ModuleUninstallCommand;
-use Eccube2\Command\PluginListCommand;
-use Eccube2\Command\PluginInfoCommand;
-use Eccube2\Command\PluginInstallCommand;
-use Eccube2\Command\PluginUpdateCommand;
-use Eccube2\Command\PluginUninstallCommand;
-use Eccube2\Command\PluginEnableCommand;
-use Eccube2\Command\PluginDisableCommand;
+use Eccube2\Command\Cache;
+use Eccube2\Command\Module;
+use Eccube2\Command\Parameter;
+use Eccube2\Command\Plugin;
+use Eccube2\Command\Template;
 
 $app = new Application();
 $app->addCommands(array(
     new InfoCommand(),
-    new ModuleListCommand(),
-    new ModuleInfoCommand(),
-    new ModuleInstallCommand(),
-    new ModuleUpdateCommand(),
-    new ModuleUninstallCommand(),
-    new PluginListCommand(),
-    new PluginInfoCommand(),
-    new PluginInstallCommand(),
-    new PluginUpdateCommand(),
-    new PluginUninstallCommand(),
-    new PluginEnableCommand(),
-    new PluginDisableCommand(),
+
+    new Cache\ClearCommand(),
+
+    new Module\ListCommand(),
+    new Module\InfoCommand(),
+    new Module\InstallCommand(),
+    new Module\UpdateCommand(),
+    new Module\UninstallCommand(),
+
+    new Plugin\ListCommand(),
+    new Plugin\InfoCommand(),
+    new Plugin\InstallCommand(),
+    new Plugin\UpdateCommand(),
+    new Plugin\UninstallCommand(),
+    new Plugin\EnableCommand(),
+    new Plugin\DisableCommand(),
+
+    new Template\Pc\GetCommand(),
+    new Template\Pc\SetCommand(),
+    new Template\Smartphone\GetCommand(),
+    new Template\Smartphone\SetCommand(),
+    new Template\Mobile\GetCommand(),
+    new Template\Mobile\SetCommand(),
+
+    new Parameter\GetCommand(),
+    new Parameter\SetCommand(),
 ));
 $app->run();
