@@ -12,7 +12,7 @@ class Plugin
     public function __construct()
     {
         if (!defined('ECCUBE_INSTALL')) {
-            throw new \Exception('EC-CUBEのインストール後にプラグインを追加してください.');
+            throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
         $this->dir = rtrim(PLUGIN_UPLOAD_REALDIR, '/');

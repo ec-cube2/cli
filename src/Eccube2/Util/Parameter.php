@@ -9,7 +9,7 @@ class Parameter
     public function __construct()
     {
         if (!defined('ECCUBE_INSTALL')) {
-            throw new \Exception('EC-CUBEのインストール後にプラグインを追加してください.');
+            throw new \Exception('EC-CUBEのインストールされていません.');
         }
     }
 

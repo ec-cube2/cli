@@ -10,7 +10,7 @@ class Template
     public function __construct()
     {
         if (!defined('ECCUBE_INSTALL')) {
-            throw new \Exception('EC-CUBEのインストール後にプラグインを追加してください.');
+            throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
         require_once CLASS_EX_REALDIR . 'page_extends/admin/design/LC_Page_Admin_Design_Template_Ex.php';
