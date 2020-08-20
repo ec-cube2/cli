@@ -5,8 +5,9 @@ set_time_limit(0);
 require dirname(__FILE__).'/../src/bootstrap.php';
 
 use Symfony\Component\Console\Application;
-use Eccube2\Command\InfoCommand;
+use Eccube2\Command\Backup;
 use Eccube2\Command\Cache;
+use Eccube2\Command\InfoCommand;
 use Eccube2\Command\Module;
 use Eccube2\Command\Parameter;
 use Eccube2\Command\Plugin;
@@ -18,6 +19,11 @@ $app->addCommands(array(
     new InfoCommand(),
 
     new Cache\ClearCommand(),
+
+    new Backup\ListCommand(),
+    new Backup\CreateCommand(),
+    new Backup\DeleteCommand(),
+    new Backup\RestoreCommand(),
 
     new Module\ListCommand(),
     new Module\InfoCommand(),

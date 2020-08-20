@@ -15,6 +15,11 @@ Available commands:
   help                     Displays help for a command
   info                     EC-CUBE情報
   list                     Lists commands
+ backup
+  backup:create            バックアップ作成
+  backup:delete            バックアップ削除
+  backup:list              バックアップ一覧
+  backup:restore           バックアップリストア
  cache
   cache:clear              キャッシュクリア
  module
