@@ -50,8 +50,20 @@ class Init
         }
 
         require_once $htmlDir . '/require.php';
+        static::setErrorHandler();
         static::$init = true;
 
         return new self;
+    }
+
+    public static function setErrorHandler()
+    {
+        set_error_handler(
+            function ($errno, $errstr, $errfile, $errline) {
+                if ($errno === E_ERROR || $errno === E_USER_ERROR) {
+                    throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+                }
+            }
+        );
     }
 }

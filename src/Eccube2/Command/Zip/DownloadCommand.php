@@ -36,12 +36,7 @@ class DownloadCommand extends Command
 
         $io->text('郵便番号CSVを ' .  ZIP_DOWNLOAD_URL . ' から取得します。');
 
-        try {
-            $this->zip->download();
-        } catch (\Exception $e) {
-            $io->error($e->getMessage());
-            return;
-        }
+        $this->zip->download();
 
         $io->success('郵便番号CSVを取得しました。');
     }

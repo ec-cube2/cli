@@ -15,6 +15,9 @@ class Zip
 
         require_once CLASS_EX_REALDIR . 'page_extends/admin/basis/LC_Page_Admin_Basis_ZipInstall_Ex.php';
         $this->page = new \LC_Page_Admin_Basis_ZipInstall_Ex();
+        if (defined('ZIP_TEMP_REALDIR')) {
+            $this->page->zip_csv_temp_realfile = ZIP_TEMP_REALDIR . 'ken_all.zip';
+        }
     }
 
     /**
@@ -51,7 +54,7 @@ class Zip
         $objQuery->begin();
         $this->download();
         $this->delete();
-        $count = $this->insert($function);
+        $count = $this->insert(1, $function);
         $objQuery->commit();
 
         return $count;
@@ -62,22 +65,8 @@ class Zip
      */
     public function download()
     {
-        $errorReporting = error_reporting();
-
-        error_reporting(E_ERROR | E_WARNING | E_PARSE);
-        set_error_handler(
-            function ($errno, $errstr) use ($errorReporting) {
-                restore_error_handler();
-                error_reporting($errorReporting);
-                throw new \Exception($errstr);
-            }
-        );
-
         $this->page->lfDownloadZipFileFromJp();
         $this->page->lfExtractZipFile();
-
-        restore_error_handler();
-        error_reporting($errorReporting);
     }
 
     public function delete()
@@ -121,7 +110,7 @@ class Zip
             }
 
             if (is_callable($function)) {
-                $function($cntCurrentLine, $cntLine);
+                call_user_func($function, $cntCurrentLine, $cntLine);
             }
         }
         fclose($fp);

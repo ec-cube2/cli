@@ -37,9 +37,11 @@ class InfoCommand extends Command
         $io->title('郵便番号情報');
 
         $io->section('郵便番号CSV');
-        $io->text(number_format($this->zip->countCsv()) . ' 行 (更新日時: ' . $this->zip->getCsvDateTime() . ' )');
+        $io->text(number_format($this->zip->countCsv()) . ' 行 (更新日時: ' . $this->zip->getCsvDateTime() . ')');
 
         $io->section('郵便番号DB');
         $io->text(number_format($this->zip->count()) . ' 行');
+
+        $io->newLine();
     }
 }
