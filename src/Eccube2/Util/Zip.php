@@ -15,6 +15,7 @@ class Zip
 
         require_once CLASS_EX_REALDIR . 'page_extends/admin/basis/LC_Page_Admin_Basis_ZipInstall_Ex.php';
         $this->page = new \LC_Page_Admin_Basis_ZipInstall_Ex();
+        $this->page->zip_csv_temp_realfile = DATA_REALDIR . 'downloads/tmp/ken_all.zip';
         if (defined('ZIP_TEMP_REALDIR')) {
             $this->page->zip_csv_temp_realfile = ZIP_TEMP_REALDIR . 'ken_all.zip';
         }
