@@ -72,7 +72,7 @@ class System
     /**
      * @return string
      */
-    private function getDBVersion()
+    public function getDBVersion()
     {
         $dbFactory = \SC_DB_DBFactory_Ex::getInstance();
 
@@ -82,7 +82,7 @@ class System
     /**
      * @return string
      */
-    private function getPHPVersion()
+    public function getPHPVersion()
     {
         return phpversion();
     }
@@ -90,7 +90,7 @@ class System
     /**
      * @return array
      */
-    private function getPHPModules()
+    public function getPHPModules()
     {
         return get_loaded_extensions();
     }

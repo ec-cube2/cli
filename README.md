@@ -22,6 +22,14 @@ Available commands:
   backup:restore           バックアップリストア
  cache
   cache:clear              キャッシュクリア
+ install
+  install:agreement        ソフトウェア使用許諾書
+  install:config           インストール 設定
+  install:copy-image       インストール 画像コピー
+  install:create-sequence  インストール シーケンス作成
+  install:create-table     インストール テーブル作成
+  install:drop-table       インストール テーブル削除
+  install:insert-data      インストール 初期データ作成
  member
   member:create            メンバー作成
   member:delete            メンバー削除

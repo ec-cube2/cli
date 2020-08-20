@@ -32,7 +32,7 @@ class Init
                     $baseDir = realpath($vendorDir . '/..');
                 }
             } else {
-                throw new \Exception('vendor が推測できません.指定してください.');
+                throw new \Exception('vendor が推測できません。 $htmlDir を指定してください。');
             }
 
             // htmlディレクトリあり
@@ -46,7 +46,7 @@ class Init
         }
 
         if (!file_exists($htmlDir . '/require.php')) {
-            throw new \Exception('HTML_REALDIR が推測できません.指定してください.');
+            throw new \Exception('require.php が見つかりません。 $htmlDir を設定してください。');
         }
 
         require_once $htmlDir . '/require.php';

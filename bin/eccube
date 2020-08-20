@@ -8,6 +8,7 @@ use Symfony\Component\Console\Application;
 use Eccube2\Command\Backup;
 use Eccube2\Command\Cache;
 use Eccube2\Command\InfoCommand;
+use Eccube2\Command\Install;
 use Eccube2\Command\Member;
 use Eccube2\Command\Module;
 use Eccube2\Command\Parameter;
@@ -20,6 +21,14 @@ $app->addCommands(array(
     new InfoCommand(),
 
     new Cache\ClearCommand(),
+
+    new Install\AgreementCommand(),
+    new Install\ConfigCommand(),
+    new Install\CopyImageCommand(),
+    new Install\CreateTableCommand(),
+    new Install\CreateSequenceCommand(),
+    new Install\DropTableCommand(),
+    new Install\InsertDataCommand(),
 
     new Backup\ListCommand(),
     new Backup\CreateCommand(),
