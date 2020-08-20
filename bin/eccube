@@ -8,6 +8,7 @@ use Symfony\Component\Console\Application;
 use Eccube2\Command\Backup;
 use Eccube2\Command\Cache;
 use Eccube2\Command\InfoCommand;
+use Eccube2\Command\Member;
 use Eccube2\Command\Module;
 use Eccube2\Command\Parameter;
 use Eccube2\Command\Plugin;
@@ -24,6 +25,12 @@ $app->addCommands(array(
     new Backup\CreateCommand(),
     new Backup\DeleteCommand(),
     new Backup\RestoreCommand(),
+
+    new Member\CreateCommand(),
+    new Member\EnableCommand(),
+    new Member\DisableCommand(),
+    new Member\DeleteCommand(),
+    new Member\SetPasswordCommand(),
 
     new Module\ListCommand(),
     new Module\InfoCommand(),

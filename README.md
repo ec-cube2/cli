@@ -22,6 +22,12 @@ Available commands:
   backup:restore           バックアップリストア
  cache
   cache:clear              キャッシュクリア
+ member
+  member:create            メンバー作成
+  member:delete            メンバー削除
+  member:disable           メンバー無効化
+  member:enable            メンバー有効化
+  member:set-password      メンバーパスワード設定
  module
   module:info              モジュール情報
   module:install           モジュールインストール
