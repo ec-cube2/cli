@@ -36,6 +36,7 @@ class ListCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('モジュール一覧')
         ;
     }
 

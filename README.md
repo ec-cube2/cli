@@ -12,28 +12,28 @@ $ composer install ec-cube2/cli
 ```
 $ ./vendor/bin/eccube
 Available commands:
-  help              Displays help for a command
-  list              Lists commands
-  info              EC-CUBE情報
+  help                     Displays help for a command
+  info                     EC-CUBE情報
+  list                     Lists commands
  cache
-  cache:clear       キャッシュクリア
+  cache:clear              キャッシュクリア
  module
-  module:list       モジュール一覧
-  module:info       モジュール情報
-  module:install    モジュールインストール
-  module:uninstall  モジュールアンインストール
-  module:update     モジュールアップデート
+  module:info              モジュール情報
+  module:install           モジュールインストール
+  module:list              モジュール一覧
+  module:uninstall         モジュールアンインストール
+  module:update            モジュールアップデート
  parameter
-  parameter:get     パラメーター表示
-  parameter:set     パラメーター設定
+  parameter:get            パラメーター表示
+  parameter:set            パラメーター設定
  plugin
-  plugin:list       プラグイン一覧
-  plugin:info       プラグイン情報
-  plugin:install    プラグインインストール
-  plugin:uninstall  プラグインアンインストール
-  plugin:enable     プラグイン有効化
-  plugin:disable    プラグイン無効化
-  plugin:update     プラグインアップデート
+  plugin:disable           プラグイン無効化
+  plugin:enable            プラグイン有効化
+  plugin:info              プラグイン情報
+  plugin:install           プラグインインストール
+  plugin:list              プラグイン一覧
+  plugin:uninstall         プラグインアンインストール
+  plugin:update            プラグインアップデート
  template
   template:mobile:get      モバイルテンプレートコード表示
   template:mobile:set      モバイルテンプレートコード設定

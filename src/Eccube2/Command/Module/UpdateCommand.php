@@ -36,6 +36,7 @@ class UpdateCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('モジュールアップデート')
             ->addArgument('code', InputArgument::REQUIRED, 'モジュールコード')
         ;
     }

@@ -46,7 +46,8 @@ class ClearCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
-            ->addOption('no-warmup', null, InputOption::VALUE_NONE)
+            ->setDescription('キャッシュクリア')
+            ->addOption('no-warmup', null, InputOption::VALUE_NONE, 'パラメータキャッシュを再生成しない')
         ;
     }
 

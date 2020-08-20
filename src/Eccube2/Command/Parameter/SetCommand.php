@@ -37,6 +37,7 @@ class SetCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('パラメーター設定')
             ->addArgument('key', InputArgument::REQUIRED, '定数名')
             ->addArgument('value', InputArgument::REQUIRED, 'パラメーター値')
         ;

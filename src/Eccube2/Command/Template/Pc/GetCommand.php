@@ -35,6 +35,7 @@ class GetCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('PCテンプレートコード表示')
         ;
     }
 

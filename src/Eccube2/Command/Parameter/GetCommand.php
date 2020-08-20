@@ -36,6 +36,7 @@ class GetCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('パラメーター表示')
             ->addArgument('key', InputArgument::REQUIRED, '定数名')
         ;
     }

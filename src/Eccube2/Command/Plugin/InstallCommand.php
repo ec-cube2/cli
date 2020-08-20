@@ -36,6 +36,7 @@ class InstallCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('プラグインインストール')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;
     }

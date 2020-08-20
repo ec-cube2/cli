@@ -36,6 +36,7 @@ class EnableCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('プラグイン有効化')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;
     }

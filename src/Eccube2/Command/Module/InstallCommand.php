@@ -36,6 +36,7 @@ class InstallCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('モジュールインストール')
             ->addArgument('code', InputArgument::REQUIRED, 'モジュールコード')
         ;
     }

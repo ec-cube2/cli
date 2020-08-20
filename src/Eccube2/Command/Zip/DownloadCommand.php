@@ -27,6 +27,7 @@ class DownloadCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('郵便番号CSVダウンロード')
         ;
     }
 

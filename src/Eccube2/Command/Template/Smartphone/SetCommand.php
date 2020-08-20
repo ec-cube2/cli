@@ -36,6 +36,7 @@ class SetCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('スマートフォンテンプレートコード設定')
             ->addArgument('code', InputArgument::REQUIRED, 'テンプレートコード')
         ;
     }

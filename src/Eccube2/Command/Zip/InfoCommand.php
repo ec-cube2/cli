@@ -27,6 +27,7 @@ class InfoCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('郵便番号情報')
         ;
     }
 

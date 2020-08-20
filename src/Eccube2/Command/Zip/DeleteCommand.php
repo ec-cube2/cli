@@ -28,7 +28,8 @@ class DeleteCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
-            ->addOption('yes', 'y', InputOption::VALUE_NONE)
+            ->setDescription('郵便番号データ削除')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
         ;
     }
 

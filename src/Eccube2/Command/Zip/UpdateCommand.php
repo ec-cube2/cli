@@ -27,6 +27,7 @@ class UpdateCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('郵便番号更新')
         ;
     }
 

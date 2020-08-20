@@ -36,6 +36,7 @@ class UninstallCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('モジュールアンインストール')
             ->addArgument('code', InputArgument::REQUIRED, 'モジュールコード')
         ;
     }

@@ -37,6 +37,7 @@ class InfoCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('プラグイン情報')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;
     }

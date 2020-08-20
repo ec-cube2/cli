@@ -29,6 +29,7 @@ class InfoCommand extends Command
     {
         $this
             ->setName(static::$defaultName)
+            ->setDescription('EC-CUBE情報')
         ;
     }
 
