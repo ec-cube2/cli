@@ -40,14 +40,14 @@ class Install
 
     public function __construct()
     {
-        define('INSTALL_DIR', HTML_REALDIR . 'install/');
+        define('INSTALL_REALDIR', HTML_REALDIR . 'install/');
         define('INSTALL_INFO_URL', 'http://www.ec-cube.net/install_info/index.php');
         define('DEFAULT_COUNTRY_ID', 392);
     }
 
     public function agreement()
     {
-        $html = file_get_contents(INSTALL_DIR . 'templates/agreement.tpl');
+        $html = file_get_contents(INSTALL_REALDIR . 'templates/agreement.tpl');
         $matches = array();
         preg_match('|<div id="agreement">(.+?)</div>|s', $html, $matches);
         $agreement = $matches[1];
@@ -68,7 +68,7 @@ class Install
      */
     public function createTable()
     {
-        $this->executeSQL('./sql/create_table_' . DB_TYPE . '.sql');
+        $this->executeSQL(INSTALL_REALDIR . 'sql/create_table_' . DB_TYPE . '.sql');
     }
 
     /**
@@ -76,7 +76,7 @@ class Install
      */
     public function insertData()
     {
-        $this->executeSQL('./sql/insert_data.sql');
+        $this->executeSQL(INSTALL_REALDIR . 'sql/insert_data.sql');
     }
 
     /**
@@ -84,7 +84,7 @@ class Install
      */
     public function dropTable()
     {
-        $this->executeSQL('/sql/drop_table.sql');
+        $this->executeSQL(INSTALL_REALDIR . 'sql/drop_table.sql');
     }
 
     /**
@@ -93,7 +93,7 @@ class Install
      */
     public function copyImage()
     {
-        return \SC_Utils_Ex::sfCopyDir('./save_image/', HTML_REALDIR . 'upload/save_image/');
+        return \SC_Utils_Ex::sfCopyDir(INSTALL_REALDIR . 'save_image/', HTML_REALDIR . 'upload/save_image/');
     }
 
     public function createDirectory($umask = 0)
