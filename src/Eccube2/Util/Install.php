@@ -139,30 +139,63 @@ class Install
         }
 
         $objQuery = \SC_Query_Ex::getSingletonInstance();
+        /** @var \MDB2_Driver_Common $objDB */
+        $objDB = $objQuery->conn;
 
         $sql_split = split(';', $sql);
         foreach ($sql_split as $key => $val) {
-            \SC_Utils::sfFlush(true);
-
             if (trim($val) === '') {
                 continue;
             }
 
-            $objQuery->query($val);
+            $objDB->query($val);
         }
     }
 
+    /**
+     * @throws \Exception
+     */
     public function createSequence()
     {
         $objQuery = \SC_Query_Ex::getSingletonInstance();
+        /** @var \MDB2_Driver_Common $objDB */
+        $objDB = $objQuery->conn;
+        /** @var \MDB2_Driver_Manager_Common $objManager */
+        $objManager = $objDB->loadModule('Manager');
 
         foreach ($this->sequences as $seq) {
-            \SC_Utils::sfFlush(true);
-
             $max = $objQuery->max($seq[1], $seq[0]);
 
             $seq_name = $seq[0] . '_' . $seq[1];
-            $objQuery->setVal($seq_name, $max + 1);
+            $result = $objManager->createSequence($seq_name, $max + 1);
+
+            if (\PEAR::isError($result)) {
+                throw new \Exception($result->message);
+            }
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function dropSequence()
+    {
+        $objQuery = \SC_Query_Ex::getSingletonInstance();
+        /** @var \MDB2_Driver_Common $objDB */
+        $objDB = $objQuery->conn;
+        /** @var \MDB2_Driver_Manager_Common $objManager */
+        $objManager = $objDB->loadModule('Manager');
+
+        $exists = $objManager->listSequences();
+        foreach ($this->sequences as $seq) {
+            $seq_name = $seq[0] . '_' . $seq[1];
+            if (in_array($seq_name, $exists)) {
+                $result = $objManager->dropSequence($seq_name);
+
+                if (\PEAR::isError($result)) {
+                    throw new \Exception($result->message);
+                }
+            }
         }
     }
 
@@ -190,7 +223,19 @@ class Install
         }
     }
 
-    public function createSendInfo()
+    /**
+     * @throws \Exception
+     */
+    public function sendInfo()
+    {
+        $this->sendInfoExecute($this->getSendInfo());
+    }
+
+    /**
+     * @return array
+     * @throws \Exception
+     */
+    public function getSendInfo()
     {
         $system = new System();
         $baseInfo = new BaseInfo();
@@ -206,7 +251,31 @@ class Install
         );
     }
 
-    public function createBaseInfo($shopName, $adminMail)
+    /**
+     * @param array $arrSendData
+     * @return string
+     * @throws \Exception
+     */
+    public function sendInfoExecute($arrSendData)
+    {
+        // サイト情報を送信
+        $req = new \HTTP_Request('http://www.ec-cube.net/mall/use_site.php');
+        $req->setMethod(HTTP_REQUEST_METHOD_POST);
+
+        foreach ($arrSendData as $key => $val) {
+            $req->addPostData($key, $val);
+        }
+
+        if (!\PEAR::isError($req->sendRequest())) {
+            $response = $req->getResponseBody();
+        } else {
+            throw new \Exception('');
+        }
+
+        return $response;
+    }
+
+    public function setBaseInfo($shopName, $adminMail)
     {
         $sqlval = array(
             'id' => 1,
@@ -230,29 +299,5 @@ class Install
         } else {
             $objQuery->insert('dtb_baseinfo', $sqlval);
         }
-    }
-
-    /**
-     * @param array $arrSendData
-     * @return string
-     */
-    public function sendInfo($arrSendData)
-    {
-        // サイト情報を送信
-        $req = new \HTTP_Request('http://www.ec-cube.net/mall/use_site.php');
-        $req->setMethod(HTTP_REQUEST_METHOD_POST);
-
-        foreach ($arrSendData as $key => $val) {
-            $req->addPostData($key, $val);
-        }
-
-        if (!\PEAR::isError($req->sendRequest())) {
-            $response = $req->getResponseBody();
-        } else {
-            $response = '';
-        }
-        $req->clearPostData();
-
-        return $response;
     }
 }

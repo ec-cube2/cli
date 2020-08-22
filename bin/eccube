@@ -9,11 +9,13 @@ use Eccube2\Command\Backup;
 use Eccube2\Command\Cache;
 use Eccube2\Command\InfoCommand;
 use Eccube2\Command\Install;
+use Eccube2\Command\InstallCommand;
 use Eccube2\Command\Member;
 use Eccube2\Command\Module;
 use Eccube2\Command\Parameter;
 use Eccube2\Command\Plugin;
 use Eccube2\Command\Template;
+use Eccube2\Command\Util;
 use Eccube2\Command\Zip;
 
 $app = new Application();
@@ -22,13 +24,18 @@ $app->addCommands(array(
 
     new Cache\ClearCommand(),
 
+    new Util\RandomStringCommand(),
+
+    new InstallCommand(),
     new Install\AgreementCommand(),
     new Install\ConfigCommand(),
     new Install\CopyImageCommand(),
     new Install\CreateTableCommand(),
-    new Install\CreateSequenceCommand(),
     new Install\DropTableCommand(),
+    new Install\CreateSequenceCommand(),
+    new Install\DropSequenceCommand(),
     new Install\InsertDataCommand(),
+    new Install\SendInfoCommand(),
 
     new Backup\ListCommand(),
     new Backup\CreateCommand(),

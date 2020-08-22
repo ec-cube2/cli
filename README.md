@@ -14,6 +14,7 @@ $ ./vendor/bin/eccube
 Available commands:
   help                     Displays help for a command
   info                     EC-CUBE情報
+  install                  インストール
   list                     Lists commands
  backup
   backup:create            バックアップ作成
@@ -28,8 +29,10 @@ Available commands:
   install:copy-image       インストール 画像コピー
   install:create-sequence  インストール シーケンス作成
   install:create-table     インストール テーブル作成
+  install:drop-sequence    インストール シーケンス削除
   install:drop-table       インストール テーブル削除
   install:insert-data      インストール 初期データ作成
+  install:send-info        インストール インストール情報送信
  member
   member:create            メンバー作成
   member:delete            メンバー削除
@@ -60,6 +63,8 @@ Available commands:
   template:pc:set          PCテンプレートコード設定
   template:smartphone:get  スマートフォンテンプレートコード表示
   template:smartphone:set  スマートフォンテンプレートコード設定
+ util
+  util:random-string       ランダムな文字列を生成
  zip
   zip:delete               郵便番号データ削除
   zip:download             郵便番号CSVダウンロード
@@ -67,13 +72,6 @@ Available commands:
   zip:update               郵便番号更新
 ```
 
-```
-$ ./vendor/bin/eccube plugin:install PlginName
-```
-
-```
-$ ./vendor/bin/eccube module:install mdl_name
-```
 
 ## Requirements
 
@@ -85,14 +83,3 @@ PHP 5.3.3 以上
 それぞれのコマンドが利用する機能は `Eccube2\Util` にまとめています。
 
 追加機能の要望やバグ報告は Issue からお願いします。
-
-
-## Author
-
-Tsuyoshi Tsurushima
-
-
-## License
-
-EC-CUBE2 CLI は LGPL-3.0 でライセンスされています。 - LICENSE ファイルに詳細の記載があります。  
-EC-CUBE2 CLI is licensed under the LGPL-3.0 License - see the LICENSE file for details.
