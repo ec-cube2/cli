@@ -47,7 +47,7 @@ class InstallCommand extends Command
             ->addArgument('shop_name', InputArgument::OPTIONAL, '店名')
             ->addArgument('admin_mail', InputArgument::OPTIONAL, '管理者メールアドレス')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
-            ->addOption('send_info', null, InputOption::VALUE_NONE, 'インストール情報を送信')
+            ->addOption('no-send-info', null, InputOption::VALUE_NONE, 'インストール情報を送信しない')
         ;
     }
 
@@ -150,7 +150,7 @@ class InstallCommand extends Command
         $io->text($arrSendData['db_ver']);
         $io->section('OS情報');
         $io->text($arrSendData['os_type']);
-        if ($input->getOption('send_info') || $io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
+        if (!$input->getOption('no-send-info') && $io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
             $this->install->sendInfoExecute($arrSendData);
             $io->success('インストール情報を送信しました。');
         }
