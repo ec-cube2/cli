@@ -104,14 +104,16 @@ class CreateCommand extends Command
         if ($input->getOption('authority')) {
             $member['authority'] = $input->getOption('authority');
         } else {
-            $member['authority'] = $io->choice('権限を選択してください。', $this->member->arrAUTHORITY);
+            $authority = $io->choice('権限を選択してください。', $this->member->arrAUTHORITY);
+            $member['authority'] = array_search($authority, $this->member->arrAUTHORITY, true);
         }
 
         // work
         if ($input->getOption('work')) {
             $member['work'] = $input->getOption('work');
         } else {
-            $member['work'] = $io->choice('稼働/非稼働を選択してください。', $this->member->arrWORK);
+            $work = $io->choice('稼働/非稼働を選択してください。', $this->member->arrWORK);
+            $member['work'] = array_search($work, $this->member->arrWORK, true);
         }
 
         $this->member->create($member);
