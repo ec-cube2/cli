@@ -44,14 +44,17 @@ class InstallCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール')
-            ->addArgument('shop_name, ', InputArgument::OPTIONAL, '店名')
+            ->addArgument('shop_name', InputArgument::OPTIONAL, '店名')
             ->addArgument('admin_mail', InputArgument::OPTIONAL, '管理者メールアドレス')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
+            ->addOption('send_info', null, InputOption::VALUE_NONE, 'インストール情報を送信')
         ;
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
+        define('SAFE', true);
+        define('INSTALL_FUNCTION', true);
         Init::init();
 
         $this->install = new Install();
@@ -68,7 +71,7 @@ class InstallCommand extends Command
 
         $io->section('ソフトウェア使用許諾書');
         $io->writeln($this->install->agreement());
-        if ($io->confirm('ソフトウェア使用許諾書に同意しますか？', false)) {
+        if (!$io->confirm('ソフトウェア使用許諾書に同意しますか？', false)) {
             return;
         }
 
@@ -102,7 +105,7 @@ class InstallCommand extends Command
         $shopName = $input->getArgument('shop_name');
         if (!$shopName) {
             $io->ask('店名を入力してください', null, function ($shopName) {
-                if (empty($name)) {
+                if (empty($shopName)) {
                     throw new \RuntimeException('店名は空にできません。');
                 }
 
@@ -112,7 +115,7 @@ class InstallCommand extends Command
         $adminMail = $input->getArgument('admin_mail');
         if (!$adminMail) {
             $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
-                if (empty($name)) {
+                if (empty($adminMail)) {
                     throw new \RuntimeException('管理者メールアドレスは空にできません。');
                 }
 
@@ -125,6 +128,12 @@ class InstallCommand extends Command
         $io->section('画像コピー');
         $message = $this->install->copyImage();
         $io->block($message);
+
+        $io->section('キャッシュクリア');
+        $this->masterData->clearAllCache();
+        $this->parameter->createCache();
+        $this->template->clearAllCache();
+        $io->success('キャッシュをクリアしました。');
 
         $io->section('インストール情報送信');
         $arrSendData = $this->install->getSendInfo();
@@ -141,17 +150,11 @@ class InstallCommand extends Command
         $io->text($arrSendData['db_ver']);
         $io->section('OS情報');
         $io->text($arrSendData['os_type']);
-        if ($input->getOption('yes') || $io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
+        if ($input->getOption('send_info') || $io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
             $this->install->sendInfoExecute($arrSendData);
             $io->success('インストール情報を送信しました。');
         }
 
-        $io->section('キャッシュクリア');
-        $this->masterData->clearAllCache();
-        $this->parameter->createCache();
-        $this->template->clearAllCache();
-
-        $io->section('キャッシュクリア');
         $io->success(array(
             'インストールが完了しました。',
             HTTPS_URL . ' からアクセスしてください。',

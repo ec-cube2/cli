@@ -40,7 +40,13 @@ class Install
 
     public function __construct()
     {
-        define('INSTALL_REALDIR', HTML_REALDIR . 'install/');
+        if (is_dir(HTML_REALDIR . 'install/')) {
+            define('INSTALL_REALDIR', HTML_REALDIR . 'install/');
+        } elseif (is_dir(DATA_REALDIR . '../html/install/')) {
+            define('INSTALL_REALDIR', DATA_REALDIR . '../html/install/');
+        } else {
+            throw new \Exception('INSTALL_REALDIR を設定してください。');
+        }
         define('INSTALL_INFO_URL', 'http://www.ec-cube.net/install_info/index.php');
         define('DEFAULT_COUNTRY_ID', 392);
     }

@@ -31,7 +31,7 @@ class SetBaseInfoCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール 店舗情報設定')
-            ->addArgument('shop_name, ', InputArgument::OPTIONAL, '店名')
+            ->addArgument('shop_name', InputArgument::OPTIONAL, '店名')
             ->addArgument('admin_mail', InputArgument::OPTIONAL, '管理者メールアドレス')
         ;
     }
@@ -43,7 +43,7 @@ class SetBaseInfoCommand extends Command
         $shopName = $input->getArgument('shop_name');
         if (!$shopName) {
             $io->ask('店名を入力してください', null, function ($shopName) {
-                if (empty($name)) {
+                if (empty($shopName)) {
                     throw new \RuntimeException('店名は空にできません。');
                 }
 
@@ -54,7 +54,7 @@ class SetBaseInfoCommand extends Command
         $adminMail = $input->getArgument('admin_mail');
         if (!$adminMail) {
             $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
-                if (empty($name)) {
+                if (empty($adminMail)) {
                     throw new \RuntimeException('管理者メールアドレスは空にできません。');
                 }
 

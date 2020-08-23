@@ -18,7 +18,7 @@ class BaseInfo
     {
         $objDb = new \SC_Helper_DB_Ex();
 
-        return $objDb->sfGetBasisData();
+        return $objDb->sfGetBasisData(true);
     }
 
     /**
