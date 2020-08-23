@@ -30,7 +30,7 @@ class CreateTableCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール テーブル作成')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -41,11 +41,8 @@ class CreateTableCommand extends Command
         if (!$input->getOption('yes') && !$io->confirm('テーブルを作成しますか？')) {
             return;
         }
-
         $io->text('テーブルの作成を開始します。');
-
         $this->install->createTable();
-
         $io->success('テーブルの作成に成功しました。');
     }
 }

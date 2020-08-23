@@ -31,7 +31,7 @@ class DeleteCommand extends Command
             ->setName(static::$defaultName)
             ->setDescription('バックアップ削除')
             ->addArgument('name', InputArgument::REQUIRED, 'バックアップ名')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -39,7 +39,7 @@ class DeleteCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？')) {
+        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
             return;
         }
 

@@ -35,6 +35,7 @@ $app->addCommands(array(
     new Install\CreateSequenceCommand(),
     new Install\DropSequenceCommand(),
     new Install\InsertDataCommand(),
+    new Install\SetBaseInfoCommand(),
     new Install\SendInfoCommand(),
 
     new Backup\ListCommand(),

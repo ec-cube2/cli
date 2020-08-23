@@ -39,7 +39,6 @@ class SendInfoCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $arrSendData = $this->install->getSendInfo();
-
         $io->title('サイト情報');
         $io->section('サイトURL');
         $io->text($arrSendData['site_url']);
@@ -53,13 +52,10 @@ class SendInfoCommand extends Command
         $io->text($arrSendData['db_ver']);
         $io->section('OS情報');
         $io->text($arrSendData['os_type']);
-
         if (!$input->getOption('yes') && !$io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
             return;
         }
-
         $this->install->sendInfoExecute($arrSendData);
-
         $io->success('インストール情報を送信しました。');
     }
 }

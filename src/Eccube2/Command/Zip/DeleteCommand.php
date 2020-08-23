@@ -29,7 +29,7 @@ class DeleteCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('郵便番号データ削除')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -37,7 +37,7 @@ class DeleteCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？')) {
+        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
             return;
         }
 

@@ -30,7 +30,7 @@ class DropSequenceCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール シーケンス削除')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -38,7 +38,7 @@ class DropSequenceCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getOption('yes') && !$io->confirm('シーケンスを削除しますか？')) {
+        if (!$input->getOption('yes') && !$io->confirm('シーケンスを削除しますか？', false)) {
             return;
         }
 

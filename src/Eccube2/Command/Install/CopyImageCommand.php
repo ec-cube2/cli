@@ -37,7 +37,6 @@ class CopyImageCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $message = $this->install->copyImage();
-
         $io->block($message);
     }
 }

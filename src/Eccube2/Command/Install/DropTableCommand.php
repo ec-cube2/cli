@@ -30,7 +30,7 @@ class DropTableCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール テーブル削除')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -38,7 +38,7 @@ class DropTableCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？')) {
+        if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
             return;
         }
 

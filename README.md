@@ -33,6 +33,7 @@ Available commands:
   install:drop-table       インストール テーブル削除
   install:insert-data      インストール 初期データ作成
   install:send-info        インストール インストール情報送信
+  install:set-base-info    インストール 店舗情報設定
  member
   member:create            メンバー作成
   member:delete            メンバー削除

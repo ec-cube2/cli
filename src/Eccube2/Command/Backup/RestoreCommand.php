@@ -31,7 +31,7 @@ class RestoreCommand extends Command
             ->setName(static::$defaultName)
             ->setDescription('バックアップリストア')
             ->addArgument('name', InputArgument::REQUIRED, 'バックアップ名')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'エラーを無視')
         ;
     }
@@ -40,7 +40,7 @@ class RestoreCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        if (!$input->getOption('yes') && !$io->confirm('本当にリストアしますか？')) {
+        if (!$input->getOption('yes') && !$io->confirm('本当にリストアしますか？', false)) {
             return;
         }
 

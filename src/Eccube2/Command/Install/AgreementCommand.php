@@ -36,8 +36,6 @@ class AgreementCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $agreement = $this->install->agreement();
-
-        $io->writeln($agreement);
+        $io->writeln($this->install->agreement());
     }
 }

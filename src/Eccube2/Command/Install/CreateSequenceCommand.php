@@ -30,7 +30,7 @@ class CreateSequenceCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール シーケンス作成')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -41,9 +41,7 @@ class CreateSequenceCommand extends Command
         if (!$input->getOption('yes') && !$io->confirm('シーケンスを作成しますか？')) {
             return;
         }
-
         $this->install->createSequence();
-
         $io->success('シーケンスの作成に成功しました。');
     }
 }

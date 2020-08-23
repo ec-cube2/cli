@@ -30,7 +30,7 @@ class InsertDataCommand extends Command
         $this
             ->setName(static::$defaultName)
             ->setDescription('インストール 初期データ作成')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'すべてYES')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
     }
 
@@ -41,11 +41,8 @@ class InsertDataCommand extends Command
         if (!$input->getOption('yes') && !$io->confirm('初期データを作成しますか？')) {
             return;
         }
-
         $io->text('初期データの作成を開始します。');
-
         $this->install->insertData();
-
         $io->success('初期データの作成に成功しました。');
     }
 }
