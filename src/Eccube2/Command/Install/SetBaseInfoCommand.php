@@ -41,8 +41,8 @@ class SetBaseInfoCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         $shopName = $input->getArgument('shop_name');
-        if (!$shopName) {
-            $io->ask('店名を入力してください', null, function ($shopName) {
+        if (empty($shopName)) {
+            $shopName = $io->ask('店名を入力してください', null, function ($shopName) {
                 if (empty($shopName)) {
                     throw new \RuntimeException('店名は空にできません。');
                 }
@@ -52,8 +52,8 @@ class SetBaseInfoCommand extends Command
         }
 
         $adminMail = $input->getArgument('admin_mail');
-        if (!$adminMail) {
-            $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
+        if (empty($adminMail)) {
+            $adminMail = $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
                 if (empty($adminMail)) {
                     throw new \RuntimeException('管理者メールアドレスは空にできません。');
                 }
