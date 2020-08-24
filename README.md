@@ -46,6 +46,9 @@ Available commands:
   module:list              モジュール一覧
   module:uninstall         モジュールアンインストール
   module:update            モジュールアップデート
+ ownersstore
+  ownersstore:list         オーナーズストア一覧
+  ownersstore:set-key      オーナーズストア認証キー設定
  parameter
   parameter:get            パラメーター表示
   parameter:set            パラメーター設定
