@@ -103,8 +103,8 @@ class InstallCommand extends Command
 
         $io->section('店舗情報設定');
         $shopName = $input->getArgument('shop_name');
-        if (!$shopName) {
-            $io->ask('店名を入力してください', null, function ($shopName) {
+        if (empty($shopName)) {
+            $shopName = $io->ask('店名を入力してください', null, function ($shopName) {
                 if (empty($shopName)) {
                     throw new \RuntimeException('店名は空にできません。');
                 }
@@ -113,8 +113,8 @@ class InstallCommand extends Command
             });
         }
         $adminMail = $input->getArgument('admin_mail');
-        if (!$adminMail) {
-            $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
+        if (empty($adminMail)) {
+            $adminMail = $io->ask('管理者メールアドレスを入力してください', null, function ($adminMail) {
                 if (empty($adminMail)) {
                     throw new \RuntimeException('管理者メールアドレスは空にできません。');
                 }
@@ -128,6 +128,7 @@ class InstallCommand extends Command
         $io->section('画像コピー');
         $message = $this->install->copyImage();
         $io->block($message);
+        $io->success('画像をコピーしました。');
 
         $io->section('キャッシュクリア');
         $this->masterData->clearAllCache();

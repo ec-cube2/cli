@@ -42,9 +42,9 @@ class UpdateCommand extends Command
         $this->zip->download();
         $io->success('ZIPダウンロードが完了しました。');
 
-        $io->text('既存データを開始します。');
+        $io->text('既存データの削除を開始します。');
         $this->zip->delete();
-        $io->success('既存データが完了しました。');
+        $io->success('既存データの削除が完了しました。');
 
         $progressStart = false;
         $io->text('アップデートを開始します。');
