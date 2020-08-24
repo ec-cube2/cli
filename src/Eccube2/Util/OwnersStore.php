@@ -267,7 +267,7 @@ class OwnersStore
         $this->objLog->log('* json status check start');
         if ($objRet->status !== OSTORE_STATUS_SUCCESS) {
             $this->objLog->error($objRet->errcode, $objReq);
-            throw new \Exception('配信サーバー側のエラーを補足しました', $objRet->errcode);
+            throw new \Exception(preg_replace('|<br\s*/?>|', "\n", $objRet->msg), $objRet->errcode);
         }
 
         return array($objReq, $objRet->data);
