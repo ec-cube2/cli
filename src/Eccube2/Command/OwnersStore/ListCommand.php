@@ -62,7 +62,6 @@ class ListCommand extends Command
                 '導入バージョン: ' . $arrProduct['installed_version'],
                 '購入ステータス: ' . str_replace("\n", '', $arrProduct['status']),
                 '最終更新: ' . $arrProduct['last_update_date'],
-                '商品ID: ' . $arrProduct['product_id'],
             ));
 
             if ($i + 1 < $last) {
