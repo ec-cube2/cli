@@ -71,7 +71,9 @@ class InstallCommand extends Command
 
         $io->section('ソフトウェア使用許諾書');
         $io->writeln($this->install->agreement());
-        if (!$io->confirm('ソフトウェア使用許諾書に同意しますか？', false)) {
+        if (!$input->getOption('yes') && !$io->confirm('ソフトウェア使用許諾書に同意しますか？', false)) {
+            $io->error('ソフトウェア使用許諾書に同意してください。');
+
             return;
         }
 
