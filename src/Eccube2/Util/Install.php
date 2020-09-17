@@ -169,14 +169,17 @@ class Install
         /** @var \MDB2_Driver_Manager_Common $objManager */
         $objManager = $objDB->loadModule('Manager');
 
+        $exists = $objManager->listSequences();
         foreach ($this->sequences as $seq) {
             $max = $objQuery->max($seq[1], $seq[0]);
 
             $seq_name = $seq[0] . '_' . $seq[1];
-            $result = $objManager->createSequence($seq_name, $max + 1);
+            if (!in_array($seq_name, $exists)) {
+                $result = $objManager->createSequence($seq_name, $max + 1);
 
-            if (\PEAR::isError($result)) {
-                throw new \Exception($result->message);
+                if (\PEAR::isError($result)) {
+                    throw new \Exception($result->message);
+                }
             }
         }
     }
