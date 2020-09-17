@@ -174,7 +174,7 @@ class Install
             $max = $objQuery->max($seq[1], $seq[0]);
 
             $seq_name = $seq[0] . '_' . $seq[1];
-            if (!in_array($seq_name, $exists)) {
+            if (!in_array($seq_name, $exists, true)) {
                 $result = $objManager->createSequence($seq_name, $max + 1);
 
                 if (\PEAR::isError($result)) {
@@ -198,7 +198,7 @@ class Install
         $exists = $objManager->listSequences();
         foreach ($this->sequences as $seq) {
             $seq_name = $seq[0] . '_' . $seq[1];
-            if (in_array($seq_name, $exists)) {
+            if (in_array($seq_name, $exists, true)) {
                 $result = $objManager->dropSequence($seq_name);
 
                 if (\PEAR::isError($result)) {
