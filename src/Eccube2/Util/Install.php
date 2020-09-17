@@ -148,7 +148,7 @@ class Install
         /** @var \MDB2_Driver_Common $objDB */
         $objDB = $objQuery->conn;
 
-        $sql_split = split(';', $sql);
+        $sql_split = explode(';', $sql);
         foreach ($sql_split as $key => $val) {
             if (trim($val) === '') {
                 continue;
