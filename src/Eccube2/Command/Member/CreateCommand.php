@@ -27,7 +27,6 @@ class CreateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('メンバー作成')
             ->addOption('name', null, InputOption::VALUE_REQUIRED, '名前')
             ->addOption('department', null, InputOption::VALUE_OPTIONAL, '所属')

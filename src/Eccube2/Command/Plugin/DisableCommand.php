@@ -35,7 +35,6 @@ class DisableCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('プラグイン無効化')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;

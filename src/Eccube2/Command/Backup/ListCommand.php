@@ -35,7 +35,6 @@ class ListCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('バックアップ一覧')
         ;
     }

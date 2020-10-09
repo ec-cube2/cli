@@ -36,7 +36,6 @@ class SetCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('パラメーター設定')
             ->addArgument('key', InputArgument::REQUIRED, '定数名')
             ->addArgument('value', InputArgument::REQUIRED, 'パラメーター値')

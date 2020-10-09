@@ -28,7 +28,6 @@ class CreateTableCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール テーブル作成')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;

@@ -27,7 +27,6 @@ class CreateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('バックアップ作成')
             ->addArgument('name', InputArgument::REQUIRED, 'バックアップ名')
             ->addArgument('memo', InputArgument::OPTIONAL, 'バックアップメモ')

@@ -28,7 +28,6 @@ class DeleteCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('バックアップ削除')
             ->addArgument('name', InputArgument::REQUIRED, 'バックアップ名')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')

@@ -27,7 +27,6 @@ class DisableCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('メンバー無効化')
             ->addArgument('login_id', InputArgument::REQUIRED, 'ログインID')
         ;

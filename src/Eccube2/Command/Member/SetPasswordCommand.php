@@ -28,7 +28,6 @@ class SetPasswordCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('メンバーパスワード設定')
             ->addArgument('login_id', InputArgument::REQUIRED, 'ログインID')
             ->addOption('password', 'p', InputOption::VALUE_REQUIRED, 'パスワード')

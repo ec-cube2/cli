@@ -29,7 +29,6 @@ class SetBaseInfoCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール 店舗情報設定')
             ->addArgument('shop_name', InputArgument::OPTIONAL, '店名')
             ->addArgument('admin_mail', InputArgument::OPTIONAL, '管理者メールアドレス')

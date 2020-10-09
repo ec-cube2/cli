@@ -34,7 +34,6 @@ class GetCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('モバイルテンプレートコード表示')
         ;
     }

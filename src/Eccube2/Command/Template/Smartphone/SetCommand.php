@@ -35,7 +35,6 @@ class SetCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('スマートフォンテンプレートコード設定')
             ->addArgument('code', InputArgument::REQUIRED, 'テンプレートコード')
         ;

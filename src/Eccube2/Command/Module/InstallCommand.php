@@ -35,7 +35,6 @@ class InstallCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('モジュールインストール')
             ->addArgument('code', InputArgument::REQUIRED, 'モジュールコード')
         ;

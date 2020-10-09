@@ -42,7 +42,6 @@ class InstallCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール')
             ->addArgument('shop_name', InputArgument::OPTIONAL, '店名')
             ->addArgument('admin_mail', InputArgument::OPTIONAL, '管理者メールアドレス')
@@ -53,7 +52,6 @@ class InstallCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
-        define('SAFE', true);
         define('INSTALL_FUNCTION', true);
         Init::init();
 

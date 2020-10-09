@@ -37,7 +37,6 @@ class SetKeyCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('オーナーズストア認証キー設定')
             ->addArgument('public_key', InputArgument::REQUIRED, '認証キー')
         ;

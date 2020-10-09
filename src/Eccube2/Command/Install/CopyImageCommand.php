@@ -27,7 +27,6 @@ class CopyImageCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール 画像コピー')
         ;
     }

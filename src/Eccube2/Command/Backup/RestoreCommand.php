@@ -28,7 +28,6 @@ class RestoreCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('バックアップリストア')
             ->addArgument('name', InputArgument::REQUIRED, 'バックアップ名')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')

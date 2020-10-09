@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Eccube2\Command\:
+        resource: '../src/Eccube2/Command/*'
+        tags:
+            - { name: 'console.command' }

@@ -26,7 +26,6 @@ class UpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('郵便番号更新')
         ;
     }

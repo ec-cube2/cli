@@ -27,7 +27,6 @@ class EnableCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('メンバー有効化')
             ->addArgument('login_id', InputArgument::REQUIRED, 'ログインID')
         ;

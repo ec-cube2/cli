@@ -28,7 +28,6 @@ class DropSequenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール シーケンス削除')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;

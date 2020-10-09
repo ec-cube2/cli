@@ -27,7 +27,6 @@ class ConfigCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール 設定')
         ;
     }

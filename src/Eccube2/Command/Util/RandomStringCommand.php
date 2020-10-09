@@ -29,7 +29,6 @@ class RandomStringCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('ランダムな文字列を生成')
             ->addArgument('length', InputArgument::OPTIONAL, '文字数', 40)
         ;

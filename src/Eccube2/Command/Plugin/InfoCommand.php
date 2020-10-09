@@ -36,7 +36,6 @@ class InfoCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('プラグイン情報')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;

@@ -28,7 +28,6 @@ class CreateSequenceCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール シーケンス作成')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;

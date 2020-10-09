@@ -28,7 +28,6 @@ class InfoCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('EC-CUBE情報')
         ;
     }

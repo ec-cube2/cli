@@ -27,7 +27,6 @@ class AgreementCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('ソフトウェア使用許諾書')
         ;
     }

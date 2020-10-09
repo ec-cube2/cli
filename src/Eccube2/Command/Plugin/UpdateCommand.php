@@ -35,7 +35,6 @@ class UpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('プラグインアップデート')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;

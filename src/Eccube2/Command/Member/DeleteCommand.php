@@ -27,7 +27,6 @@ class DeleteCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('メンバー削除')
             ->addArgument('login_id', InputArgument::REQUIRED, 'ログインID')
         ;

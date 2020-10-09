@@ -28,7 +28,6 @@ class SendInfoCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール インストール情報送信')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;

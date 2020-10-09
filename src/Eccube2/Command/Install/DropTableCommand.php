@@ -28,7 +28,6 @@ class DropTableCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('インストール テーブル削除')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;

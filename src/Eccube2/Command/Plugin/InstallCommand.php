@@ -35,7 +35,6 @@ class InstallCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('プラグインインストール')
             ->addArgument('code', InputArgument::REQUIRED, 'プラグインコード')
         ;

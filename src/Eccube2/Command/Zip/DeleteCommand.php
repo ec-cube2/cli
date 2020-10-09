@@ -27,7 +27,6 @@ class DeleteCommand extends Command
     protected function configure()
     {
         $this
-            ->setName(static::$defaultName)
             ->setDescription('郵便番号データ削除')
             ->addOption('yes', 'y', InputOption::VALUE_NONE, 'YES')
         ;
