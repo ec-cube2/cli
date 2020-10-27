@@ -2,23 +2,9 @@
 
 namespace Eccube2\Console;
 
-use Eccube2\Command\Backup;
-use Eccube2\Command\Cache;
-use Eccube2\Command\InfoCommand;
-use Eccube2\Command\Install;
-use Eccube2\Command\InstallCommand;
-use Eccube2\Command\Member;
-use Eccube2\Command\Module;
-use Eccube2\Command\OwnersStore;
-use Eccube2\Command\Parameter;
-use Eccube2\Command\Plugin;
-use Eccube2\Command\Template;
-use Eccube2\Command\Util;
-use Eccube2\Command\Zip;
 use Eccube2\Init;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application as BaseApplication;
-use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
