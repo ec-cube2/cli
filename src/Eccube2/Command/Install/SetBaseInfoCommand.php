@@ -3,7 +3,7 @@
 namespace Eccube2\Command\Install;
 
 use Eccube2\Init;
-use Eccube2\Util\Install;
+use Eccube2\Util\InstallUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +15,7 @@ class SetBaseInfoCommand extends Command
 {
     protected static $defaultName = 'install:set-base-info';
 
-    /** @var Install */
+    /** @var InstallUtil */
     protected $install;
 
     public function initialize(InputInterface $input, OutputInterface $output)
@@ -23,7 +23,7 @@ class SetBaseInfoCommand extends Command
         define('INSTALL_FUNCTION', true);
         Init::init();
 
-        $this->install = new Install();
+        $this->install = new InstallUtil();
     }
 
     protected function configure()

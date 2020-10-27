@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class MasterData
+class MasterDataUtil
 {
     /** @var \LC_Page_Admin_System_Masterdata_Ex $page */
     protected $page;

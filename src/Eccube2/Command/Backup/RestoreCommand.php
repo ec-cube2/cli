@@ -3,7 +3,7 @@
 namespace Eccube2\Command\Backup;
 
 use Eccube2\Init;
-use Eccube2\Util\Backup;
+use Eccube2\Util\BackupUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,14 +15,14 @@ class RestoreCommand extends Command
 {
     protected static $defaultName = 'backup:restore';
 
-    /** @var Backup */
+    /** @var BackupUtil */
     protected $backup;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->backup = new Backup();
+        $this->backup = new BackupUtil();
     }
 
     protected function configure()

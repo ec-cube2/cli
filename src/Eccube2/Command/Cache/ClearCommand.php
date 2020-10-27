@@ -12,9 +12,9 @@
 namespace Eccube2\Command\Cache;
 
 use Eccube2\Init;
-use Eccube2\Util\MasterData;
-use Eccube2\Util\Parameter;
-use Eccube2\Util\Template;
+use Eccube2\Util\MasterDataUtil;
+use Eccube2\Util\ParameterUtil;
+use Eccube2\Util\TemplateUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,22 +25,22 @@ class ClearCommand extends Command
 {
     protected static $defaultName = 'cache:clear';
 
-    /** @var MasterData */
+    /** @var MasterDataUtil */
     protected $masterData;
 
-    /** @var Parameter */
+    /** @var ParameterUtil */
     protected $parameter;
 
-    /** @var Template */
+    /** @var TemplateUtil */
     protected $template;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->masterData = new MasterData();
-        $this->parameter = new Parameter();
-        $this->template = new Template();
+        $this->masterData = new MasterDataUtil();
+        $this->parameter = new ParameterUtil();
+        $this->template = new TemplateUtil();
     }
 
     protected function configure()

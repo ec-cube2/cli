@@ -8,6 +8,8 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Application extends BaseApplication
 {
@@ -24,28 +26,17 @@ class Application extends BaseApplication
         // 標準コマンドをインポート
         self::prependConfigPath(realpath(__DIR__ . '/../../../config'));
 
-        $container = new ContainerBuilder();
-        $container->addCompilerPass(new AddConsoleCommandPass());
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->addCompilerPass(new RegisterListenersPass());
+        $containerBuilder->addCompilerPass(new AddConsoleCommandPass());
+        $containerBuilder->register('event_dispatcher', 'Symfony\Component\EventDispatcher\EventDispatcher');
         foreach (self::$configPaths as $configPath) {
-            $loader = new YamlFileLoader($container, new FileLocator($configPath));
+            $loader = new YamlFileLoader($containerBuilder, new FileLocator($configPath));
             $loader->load('services.yaml');
         }
-        $container->compile();
+        $containerBuilder->compile();
 
-        $this->setCommandLoader($container->get('console.command_loader'));
-
-        try {
-            $objQuery = \SC_Query_Ex::getSingletonInstance();
-            if ($objQuery->isError()) {
-                throw new \Exception();
-            }
-
-            $objPlugin = \SC_Helper_Plugin_Ex::getSingletonInstance(true);
-            if ($objPlugin instanceof \SC_Helper_Plugin_Ex) {
-                $objPlugin->doAction('Eccube2_Console_Application::__construct', array($this));
-            }
-        } catch (\Exception $e) {
-        }
+        $this->setCommandLoader($containerBuilder->get('console.command_loader'));
     }
 
     static public function appendConfigPath($path)

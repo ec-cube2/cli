@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class OwnersStore
+class OwnersStoreUtil
 {
     /** @var \LC_Page_Upgrade_Base */
     protected $page;

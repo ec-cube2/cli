@@ -3,7 +3,7 @@
 namespace Eccube2\Command\Member;
 
 use Eccube2\Init;
-use Eccube2\Util\Member;
+use Eccube2\Util\MemberUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,14 +14,14 @@ class CreateCommand extends Command
 {
     protected static $defaultName = 'member:create';
 
-    /** @var Member */
+    /** @var MemberUtil */
     protected $member;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->member = new Member();
+        $this->member = new MemberUtil();
     }
 
     protected function configure()

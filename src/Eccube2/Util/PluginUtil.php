@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Plugin
+class PluginUtil
 {
     /** @var \LC_Page_Admin_OwnersStore_Ex $page */
     protected $page;
@@ -56,7 +56,7 @@ class Plugin
         // install
         $plugin_dir_path = $this->getTargetDir($code) . '/';
         if (!is_dir($plugin_dir_path)) {
-            throw new \Exception($code . ' は存在しません。');
+            throw new \Exception($plugin_dir_path . ' は存在しません。');
         }
 
         $key = $code;

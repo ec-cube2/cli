@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Backup
+class BackupUtil
 {
     /** @var \LC_Page_Admin_System_Bkup_Ex $page */
     protected $page;

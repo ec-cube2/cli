@@ -12,7 +12,7 @@
 namespace Eccube2\Command;
 
 use Eccube2\Init;
-use Eccube2\Util\System;
+use Eccube2\Util\SystemUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -22,7 +22,7 @@ class InfoCommand extends Command
 {
     protected static $defaultName = 'info';
 
-    /** @var System */
+    /** @var SystemUtil */
     protected $system;
 
     protected function configure()
@@ -36,7 +36,7 @@ class InfoCommand extends Command
     {
         Init::init();
 
-        $this->system = new System();
+        $this->system = new SystemUtil();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

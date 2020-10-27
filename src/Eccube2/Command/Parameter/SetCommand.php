@@ -12,8 +12,8 @@
 namespace Eccube2\Command\Parameter;
 
 use Eccube2\Init;
-use Eccube2\Util\Parameter;
-use Eccube2\Util\Template;
+use Eccube2\Util\ParameterUtil;
+use Eccube2\Util\TemplateUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,14 +24,14 @@ class SetCommand extends Command
 {
     protected static $defaultName = 'parameter:set';
 
-    /** @var Parameter */
+    /** @var ParameterUtil */
     protected $parameter;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->parameter = new Parameter();
+        $this->parameter = new ParameterUtil();
     }
 
     protected function configure()

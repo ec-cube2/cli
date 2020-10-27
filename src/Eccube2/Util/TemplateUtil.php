@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Template
+class TemplateUtil
 {
     /** @var \LC_Page_Admin_Design_Template_Ex $page */
     protected $page;

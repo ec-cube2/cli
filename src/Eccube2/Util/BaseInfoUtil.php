@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class BaseInfo
+class BaseInfoUtil
 {
     public function __construct()
     {

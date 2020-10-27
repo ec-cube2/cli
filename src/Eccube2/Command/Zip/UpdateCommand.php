@@ -3,7 +3,7 @@
 namespace Eccube2\Command\Zip;
 
 use Eccube2\Init;
-use Eccube2\Util\Zip;
+use Eccube2\Util\ZipUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,14 +13,14 @@ class UpdateCommand extends Command
 {
     protected static $defaultName = 'zip:update';
 
-    /** @var Zip */
+    /** @var ZipUtil */
     protected $zip;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->zip = new Zip();
+        $this->zip = new ZipUtil();
     }
 
     protected function configure()

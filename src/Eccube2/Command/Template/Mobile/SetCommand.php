@@ -12,7 +12,7 @@
 namespace Eccube2\Command\Template\Mobile;
 
 use Eccube2\Init;
-use Eccube2\Util\Template;
+use Eccube2\Util\TemplateUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,14 +22,14 @@ class SetCommand extends Command
 {
     protected static $defaultName = 'template:mobile:set';
 
-    /** @var Template */
+    /** @var TemplateUtil */
     protected $template;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->template = new Template();
+        $this->template = new TemplateUtil();
     }
 
     protected function configure()

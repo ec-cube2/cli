@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Install
+class InstallUtil
 {
     public $sequences = array(
         array('dtb_best_products', 'best_id'),
@@ -246,8 +246,8 @@ class Install
      */
     public function getSendInfo()
     {
-        $system = new System();
-        $baseInfo = new BaseInfo();
+        $system = new SystemUtil();
+        $baseInfo = new BaseInfoUtil();
         $arrBaseInfo = $baseInfo->get();
 
         return array(

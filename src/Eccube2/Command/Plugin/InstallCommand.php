@@ -12,7 +12,7 @@
 namespace Eccube2\Command\Plugin;
 
 use Eccube2\Init;
-use Eccube2\Util\Plugin;
+use Eccube2\Util\PluginUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,14 +23,14 @@ class InstallCommand extends Command
 {
     protected static $defaultName = 'plugin:install';
 
-    /** @var Plugin */
+    /** @var PluginUtil */
     protected $plugin;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->plugin = new Plugin();
+        $this->plugin = new PluginUtil();
     }
 
     protected function configure()

@@ -3,7 +3,7 @@
 namespace Eccube2\Command\Member;
 
 use Eccube2\Init;
-use Eccube2\Util\Member;
+use Eccube2\Util\MemberUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,14 +15,14 @@ class SetPasswordCommand extends Command
 {
     protected static $defaultName = 'member:set-password';
 
-    /** @var Member */
+    /** @var MemberUtil */
     protected $member;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->member = new Member();
+        $this->member = new MemberUtil();
     }
 
     protected function configure()

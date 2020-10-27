@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Zip
+class ZipUtil
 {
     /** @var \LC_Page_Admin_Basis_ZipInstall_Ex $page */
     protected $page;

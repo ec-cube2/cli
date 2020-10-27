@@ -4,7 +4,7 @@
 namespace Eccube2\Util;
 
 
-class Parameter
+class ParameterUtil
 {
     public function __construct()
     {

@@ -12,7 +12,7 @@
 namespace Eccube2\Command\Parameter;
 
 use Eccube2\Init;
-use Eccube2\Util\Parameter;
+use Eccube2\Util\ParameterUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,14 +23,14 @@ class GetCommand extends Command
 {
     protected static $defaultName = 'parameter:get';
 
-    /** @var Parameter */
+    /** @var ParameterUtil */
     protected $parameter;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->parameter = new Parameter();
+        $this->parameter = new ParameterUtil();
     }
 
     protected function configure()

@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Member
+class MemberUtil
 {
     /** @var \LC_Page_Admin_System_Ex $page */
     protected $page;

@@ -12,7 +12,7 @@
 namespace Eccube2\Command\Module;
 
 use Eccube2\Init;
-use Eccube2\Util\Module;
+use Eccube2\Util\ModuleUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,14 +22,14 @@ class UninstallCommand extends Command
 {
     protected static $defaultName = 'module:uninstall';
 
-    /** @var Module */
+    /** @var ModuleUtil */
     protected $module;
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
         Init::init();
 
-        $this->module = new Module();
+        $this->module = new ModuleUtil();
     }
 
     protected function configure()

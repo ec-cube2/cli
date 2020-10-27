@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class System
+class SystemUtil
 {
     public function __construct()
     {

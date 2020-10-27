@@ -2,7 +2,7 @@
 
 namespace Eccube2\Util;
 
-class Module
+class ModuleUtil
 {
     protected $dir;
 

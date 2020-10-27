@@ -11,33 +11,45 @@
 
 namespace Eccube2\Command;
 
+use Eccube2\Event\Install\InsertDataEvent;
 use Eccube2\Init;
-use Eccube2\Util\Install;
-use Eccube2\Util\MasterData;
-use Eccube2\Util\Parameter;
-use Eccube2\Util\Template;
+use Eccube2\Util\InstallUtil;
+use Eccube2\Util\MasterDataUtil;
+use Eccube2\Util\ParameterUtil;
+use Eccube2\Util\TemplateUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class InstallCommand extends Command
 {
     protected static $defaultName = 'install';
 
-    /** @var Install */
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    /** @var InstallUtil */
     protected $install;
 
-    /** @var Parameter */
+    /** @var ParameterUtil */
     protected $parameter;
 
-    /** @var MasterData */
+    /** @var MasterDataUtil */
     protected $masterData;
 
-    /** @var Template */
+    /** @var TemplateUtil */
     protected $template;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        parent::__construct(null);
+
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     protected function configure()
     {
@@ -55,10 +67,10 @@ class InstallCommand extends Command
         define('INSTALL_FUNCTION', true);
         Init::init();
 
-        $this->install = new Install();
-        $this->parameter = new Parameter();
-        $this->masterData = new MasterData();
-        $this->template = new Template();
+        $this->install = new InstallUtil();
+        $this->parameter = new ParameterUtil();
+        $this->masterData = new MasterDataUtil();
+        $this->template = new TemplateUtil();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -88,6 +100,7 @@ class InstallCommand extends Command
         if ($input->getOption('yes') || $io->confirm('初期データを作成しますか？')) {
             $io->text('初期データの作成を開始します。');
             $this->install->insertData();
+            $this->eventDispatcher->dispatch('install.insert_data');
             $io->success('初期データの作成に成功しました。');
         } else {
             $io->success('初期データの作成をスキップしました。');
@@ -155,6 +168,8 @@ class InstallCommand extends Command
             $this->install->sendInfoExecute($arrSendData);
             $io->success('インストール情報を送信しました。');
         }
+
+        $this->eventDispatcher->dispatch('install.after');
 
         $io->success(array(
             'インストールが完了しました。',
