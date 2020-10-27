@@ -16,8 +16,9 @@ class Parameter
     /**
      * @param string $key
      * @param string $value
+     * @param bool $createCache
      */
-    public function set($key, $value)
+    public function set($key, $value, $createCache = true)
     {
         $objQuery = \SC_Query_Ex::getSingletonInstance();
 
@@ -25,20 +26,25 @@ class Parameter
             'name' => $value,
         ), 'id = ?', array($key));
 
-        $this->createCache();
+        if ($createCache) {
+            $this->createCache();
+        }
     }
 
     /**
      * @param string $key
      * @param string $value
      * @param string $comment
+     * @param bool $createCache
      */
-    public function add($key, $value, $comment)
+    public function add($key, $value, $comment, $createCache = true)
     {
         $masterData = new \SC_DB_MasterData_Ex();
         $masterData->insertMasterData('mtb_constants', $key, $value, $comment);
 
-        $this->createCache();
+        if ($createCache) {
+            $this->createCache();
+        }
     }
 
     /**
