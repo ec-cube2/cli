@@ -19,6 +19,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class ClearCommand extends Command
 {
@@ -52,22 +53,23 @@ class ClearCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $noWarmup = $input->getOption('no-warmup');
 
         $this->masterData->clearAllCache();
-        $output->writeln('    <info>マスタキャッシュクリア</info>');
+        $io->success('マスタキャッシュクリア');
 
         if ($noWarmup) {
             $this->parameter->clearCache();
-            $output->writeln('    <info>パラメーターキャッシュクリア</info>');
+            $io->success('パラメーターキャッシュクリア');
         } else {
             $this->parameter->createCache();
-            $output->writeln('    <info>パラメーターキャッシュクリア/生成</info>');
+            $io->success('パラメーターキャッシュクリア/生成');
         }
 
         $this->template->clearAllCache();
-        $output->writeln('    <info>テンプレートキャッシュクリア</info>');
+        $io->success('テンプレートキャッシュクリア');
 
-        $output->writeln('    <info>キャッシュをクリアしました。</info>');
+        $io->success('キャッシュをクリアしました。');
     }
 }

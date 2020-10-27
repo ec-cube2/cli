@@ -48,6 +48,6 @@ class GetCommand extends Command
         $key = $input->getArgument('key');
         $value = $this->parameter->get($key);
 
-        $io->comment($value);
+        $io->block($value);
     }
 }

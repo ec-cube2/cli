@@ -45,7 +45,7 @@ class InfoCommand extends Command
     {
         $code = $input->getArgument('code');
 
-        $plugin = $this->plugin->findOneByCode($code);
+        $plugin = $this->plugin->isInstalled($code);
         if (!$plugin) {
             throw new \InvalidArgumentException($code.' はインストールされていません。');
         }

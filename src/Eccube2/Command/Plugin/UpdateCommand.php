@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UpdateCommand extends Command
 {
@@ -42,6 +43,7 @@ class UpdateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $code = $input->getArgument('code');
 
         if (!$this->plugin->isInstalled($code)) {
@@ -51,10 +53,12 @@ class UpdateCommand extends Command
         $errors = $this->plugin->update($code);
         if ($errors) {
             foreach ($errors as $error) {
-                $output->writeln('    <error>'.$error.'</error>');
+                $io->error($error);
             }
+
+            return 1;
         } else {
-            $output->writeln('    <info>アップデートしました</info>');
+            $io->success($code . ' をアップデートしました');
         }
     }
 }

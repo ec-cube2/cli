@@ -51,6 +51,6 @@ class SetCommand extends Command
         $value = $input->getArgument('value');
         $this->parameter->set($key, $value);
 
-        $io->comment('設定しました。');
+        $io->success($key . ' を設定しました。');
     }
 }

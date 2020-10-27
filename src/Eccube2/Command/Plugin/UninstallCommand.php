@@ -17,6 +17,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class UninstallCommand extends Command
 {
@@ -42,6 +43,7 @@ class UninstallCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $code = $input->getArgument('code');
 
         if (!$this->plugin->isInstalled($code)) {
@@ -50,6 +52,6 @@ class UninstallCommand extends Command
 
         $this->plugin->uninstall($code);
 
-        $output->write('<info>'.$code.' をアンインストールしました</info>');
+        $io->success($code . ' をアンインストールしました');
     }
 }

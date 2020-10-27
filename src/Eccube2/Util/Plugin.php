@@ -55,6 +55,10 @@ class Plugin
     {
         // install
         $plugin_dir_path = $this->getTargetDir($code) . '/';
+        if (!is_dir($plugin_dir_path)) {
+            throw new \Exception($code . ' は存在しません。');
+        }
+
         $key = $code;
 
         $objQuery = \SC_Query_Ex::getSingletonInstance();
