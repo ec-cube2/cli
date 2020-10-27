@@ -9,13 +9,24 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class InsertDataCommand extends Command
 {
     protected static $defaultName = 'install:insert-data';
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /** @var InstallUtil */
     protected $install;
+
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        parent::__construct(null);
+
+        $this->eventDispatcher = $eventDispatcher;
+    }
 
     public function initialize(InputInterface $input, OutputInterface $output)
     {
@@ -42,6 +53,7 @@ class InsertDataCommand extends Command
         }
         $io->text('初期データの作成を開始します。');
         $this->install->insertData();
+        $this->eventDispatcher->dispatch('install.insert_data');
         $io->success('初期データの作成に成功しました。');
     }
 }
