@@ -45,10 +45,10 @@ class InfoCommand extends Command
     {
         $code = $input->getArgument('code');
 
-        $plugin = $this->plugin->isInstalled($code);
-        if (!$plugin) {
+        if (!$this->plugin->isInstalled($code)) {
             throw new \InvalidArgumentException($code.' はインストールされていません。');
         }
+        $plugin = $this->plugin->findOneByCode($code);
 
         $io = new SymfonyStyle($input, $output);
         $io->title('プラグイン情報');
