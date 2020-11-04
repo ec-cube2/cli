@@ -2,14 +2,12 @@
 
 namespace Eccube2\Console;
 
-use Eccube2\Init;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class Application extends BaseApplication
 {
@@ -20,8 +18,6 @@ class Application extends BaseApplication
         parent::__construct($name, $version);
 
         define('SAFE', true);
-
-        Init::init();
 
         // 標準コマンドをインポート
         self::prependConfigPath(realpath(__DIR__ . '/../../../config'));
