@@ -11,7 +11,6 @@
 
 namespace Eccube2\Command;
 
-use Eccube2\Event\Install\InsertDataEvent;
 use Eccube2\Init;
 use Eccube2\Util\InstallUtil;
 use Eccube2\Util\MasterDataUtil;
