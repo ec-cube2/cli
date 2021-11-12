@@ -3,11 +3,26 @@
 EC-CUBE2 を CLI で管理できるようになります。  
 
 
-## Installation / Usage
+## Installation
 
 ```
-$ composer install ec-cube2/cli
+$ composer require ec-cube2/cli
 ```
+
+EC-CUBE 2.17.x プロジェクトにインストールできない場合は次を試してみてください：
+
+```
+# PHP バージョン要件 (config.platform.php) を {"php": "5.5.9"} にする。
+$ vi composer.json
+
+# codeception を除去する。
+$ composer remove codeception/codeception
+
+# symfony/yaml を更新しつつインストールする。
+$ composer require ec-cube2/cli symfony/yaml --update-with-all-dependencies
+```
+
+## Usage
 
 ```
 $ ./vendor/bin/eccube

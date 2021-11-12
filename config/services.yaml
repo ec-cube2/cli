@@ -7,3 +7,6 @@ services:
         resource: '../src/Eccube2/Command/*'
         tags:
             - { name: 'console.command' }
+
+    Symfony\Component\EventDispatcher\EventDispatcherInterface:
+        alias: 'event_dispatcher'
