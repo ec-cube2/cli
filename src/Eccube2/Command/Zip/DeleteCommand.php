@@ -37,11 +37,13 @@ class DeleteCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
-            return;
+            return 0;
         }
 
         $this->zip->delete();
 
         $io->success('郵便番号データを削除しました。');
+
+        return 0;
     }
 }

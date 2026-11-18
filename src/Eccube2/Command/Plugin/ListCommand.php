@@ -57,5 +57,7 @@ class ListCommand extends Command
         $io->table(array('Code', 'Name', 'Enable'), $rows);
 
         $io->newLine();
+
+        return 0;
     }
 }

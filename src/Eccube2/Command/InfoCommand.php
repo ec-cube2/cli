@@ -58,5 +58,7 @@ class InfoCommand extends Command
         }
 
         $io->newLine();
+
+        return 0;
     }
 }

@@ -52,9 +52,11 @@ class SendInfoCommand extends Command
         $io->section('OS情報');
         $io->text($arrSendData['os_type']);
         if (!$input->getOption('yes') && !$io->confirm('株式会社EC-CUBEにインストール情報を送信しますか？')) {
-            return;
+            return 0;
         }
         $this->install->sendInfoExecute($arrSendData);
         $io->success('インストール情報を送信しました。');
+
+        return 0;
     }
 }

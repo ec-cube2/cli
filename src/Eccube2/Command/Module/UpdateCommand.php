@@ -47,5 +47,7 @@ class UpdateCommand extends Command
 
         $output->writeln('    <info>モジュールをアップデートしました.</info>');
         $output->writeln('    <info>'.$this->module->getConfigUrlByCode($code).' から設定してください</info>');
+
+        return 0;
     }
 }

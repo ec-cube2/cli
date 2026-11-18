@@ -67,5 +67,7 @@ class ListCommand extends Command
                 $io->newLine();
             }
         }
+
+        return 0;
     }
 }

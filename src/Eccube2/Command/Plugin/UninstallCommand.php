@@ -53,5 +53,7 @@ class UninstallCommand extends Command
         $this->plugin->uninstall($code);
 
         $io->success($code . ' をアンインストールしました');
+
+        return 0;
     }
 }

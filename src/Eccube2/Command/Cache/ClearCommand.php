@@ -71,5 +71,7 @@ class ClearCommand extends Command
         $io->success('テンプレートキャッシュクリア');
 
         $io->success('キャッシュをクリアしました。');
+
+        return 0;
     }
 }

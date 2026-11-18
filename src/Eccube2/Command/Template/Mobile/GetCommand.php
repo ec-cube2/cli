@@ -43,5 +43,7 @@ class GetCommand extends Command
         $code = $this->template->getMobileTemplate();
 
         $output->writeln('    <info>' . $code . '</info>');
+
+        return 0;
     }
 }

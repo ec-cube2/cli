@@ -63,5 +63,7 @@ class SetBaseInfoCommand extends Command
 
         $this->install->setBaseInfo($shopName, $adminMail);
         $io->success('店舗情報設定に成功しました。');
+
+        return 0;
     }
 }

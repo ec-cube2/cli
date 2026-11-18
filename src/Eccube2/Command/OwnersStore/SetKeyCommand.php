@@ -50,5 +50,7 @@ class SetKeyCommand extends Command
         $this->ownersStore->setPublicKey($publicKey);
 
         $io->success('認証キーを設定しました。');
+
+        return 0;
     }
 }

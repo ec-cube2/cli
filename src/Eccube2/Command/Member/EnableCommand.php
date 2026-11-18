@@ -41,5 +41,7 @@ class EnableCommand extends Command
         $this->member->setWorkByLoginId($loginId, 1);
 
         $io->success($member['name'] . ' を有効化しました。');
+
+        return 0;
     }
 }

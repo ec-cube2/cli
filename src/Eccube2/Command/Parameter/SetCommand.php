@@ -52,5 +52,7 @@ class SetCommand extends Command
         $this->parameter->set($key, $value);
 
         $io->success($key . ' を設定しました。');
+
+        return 0;
     }
 }

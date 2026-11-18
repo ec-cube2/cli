@@ -38,9 +38,11 @@ class CreateSequenceCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('シーケンスを作成しますか？')) {
-            return;
+            return 0;
         }
         $this->install->createSequence();
         $io->success('シーケンスの作成に成功しました。');
+
+        return 0;
     }
 }

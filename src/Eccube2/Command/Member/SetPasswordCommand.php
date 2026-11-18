@@ -55,5 +55,7 @@ class SetPasswordCommand extends Command
         $this->member->setPasswordByLoginId($loginId, $password);
 
         $io->success($member['name'] . ' のパスワードを変更しました。');
+
+        return 0;
     }
 }

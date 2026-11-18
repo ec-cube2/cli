@@ -52,5 +52,7 @@ class InstallCommand extends Command
 
         $output->writeln('    <info>モジュールをインストールしました.</info>');
         $output->writeln('    <info>'.$this->module->getConfigUrlById($id).' から設定してください</info>');
+
+        return 0;
     }
 }

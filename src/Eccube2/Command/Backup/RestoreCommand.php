@@ -40,7 +40,7 @@ class RestoreCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('本当にリストアしますか？', false)) {
-            return;
+            return 0;
         }
 
         $name = $input->getArgument('name');
@@ -49,5 +49,7 @@ class RestoreCommand extends Command
         $io->text($name . ' のリストアを開始します。');
         $this->backup->restore($name, $force);
         $io->success($name . ' のリストアを完了しました。');
+
+        return 0;
     }
 }

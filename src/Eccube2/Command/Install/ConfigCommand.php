@@ -37,11 +37,13 @@ class ConfigCommand extends Command
 
         if (function_exists('env')) {
             $io->comment('設定は「サーバの環境変数」もしくは「.env」から行ってください。');
-            return;
+            return 0;
         }
 
         $this->install->config();
 
         $io->success('設定が完了しました。');
+
+        return 0;
     }
 }

@@ -60,5 +60,7 @@ class UpdateCommand extends Command
         } else {
             $io->success($code . ' をアップデートしました');
         }
+
+        return 0;
     }
 }

@@ -47,5 +47,7 @@ class UninstallCommand extends Command
 
         $output->writeln('<info>'.$code.'</info>');
         $output->writeln('    <info>Uninstall Success</info>');
+
+        return 0;
     }
 }

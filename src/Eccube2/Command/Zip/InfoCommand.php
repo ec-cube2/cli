@@ -43,5 +43,7 @@ class InfoCommand extends Command
         $io->text(number_format($this->zip->count()) . ' 行');
 
         $io->newLine();
+
+        return 0;
     }
 }

@@ -38,11 +38,13 @@ class DropSequenceCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('シーケンスを削除しますか？', false)) {
-            return;
+            return 0;
         }
 
         $this->install->dropSequence();
 
         $io->success('シーケンスの削除に成功しました。');
+
+        return 0;
     }
 }

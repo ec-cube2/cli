@@ -44,5 +44,7 @@ class CreateCommand extends Command
         $this->backup->create($name, $memo);
 
         $io->success('バックアップ完了しました。');
+
+        return 0;
     }
 }
