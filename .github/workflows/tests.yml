@@ -188,11 +188,14 @@ jobs:
       matrix:
         include:
           # 2.13 は PHP 5.3〜5.6 向け。CLI は Symfony 3.4 以上が要るので PHP 5.5.9 以上になる。
-          # 2.13 は接続時に MySQL 5.7.5 で削除された storage_engine を設定するので MySQL 5.6 を使う
-          - { eccube: eccube-2.13.5-p2, php: '5.5', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli' }
-          - { eccube: eccube-2.13.5-p2, php: '5.5', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli' }
-          - { eccube: eccube-2.13.5-p2, php: '5.6', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli' }
-          - { eccube: eccube-2.13.5-p2, php: '5.6', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli' }
+          # 2.13 は接続時に MySQL 5.7.5 で削除された storage_engine を設定するので MySQL 5.6 を使う。
+          # 2.13 の MDB2 は MySQL に ext/mysql で接続するが、setup-php の PHP 5.6 (ubuntu-24.04) には
+          # ext/mysql が無い。そのため 2.13 × MySQL は PHP 5.5 で確認する
+          # (PHP 5.6 × MySQL 5.6 は、ext/mysql を入れた Docker の php:5.6-cli で手元で確認した)。
+          # Composer 2.3 以降が生成する autoload は PHP 5.6 未満で動かないので、PHP 5.5 では Composer 2.2 LTS を使う
+          - { eccube: eccube-2.13.5-p2, php: '5.5', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: eccube-2.13.5-p2, php: '5.5', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: eccube-2.13.5-p2, php: '5.6', db: pgsql, mysql: 'mysql:5.6', ext: mysqli }
           # 2.17 は PHP 5.4〜8.0 向け (EC-CUBE の CI と同じく MySQL 5.7)
           - { eccube: eccube-2.17.2-p2, php: '5.6', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
           - { eccube: eccube-2.17.2-p2, php: '5.6', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
@@ -264,13 +267,24 @@ jobs:
           php-version: '8.4'
           extensions: mbstring, xml
           coverage: none
-          tools: composer:v2
+          tools: composer:${{ matrix.composer || 'v2' }}
 
+      # setup-php は、読み込まれていない拡張も Enabled と表示することがある (PHP 5.6 の mysql で起きた)
       - name: Check PHP binaries
+        env:
+          EXTENSIONS: mbstring, gd, pgsql, zip, xml, ${{ matrix.ext }}
         run: |
           echo "PHPUnit: $(command -v php) ($(php -r 'echo PHP_VERSION;'))"
           echo "CLI: ${ECCUBE_PHP} ($("$ECCUBE_PHP" -r 'echo PHP_VERSION;'))"
-          "$ECCUBE_PHP" -m
+          composer --version
+          missing=0
+          for ext in ${EXTENSIONS//,/ }; do
+            if ! "$ECCUBE_PHP" -r "exit(extension_loaded('$ext') ? 0 : 1);" 2>/dev/null; then
+              echo "::error::PHP ${{ matrix.php }} に拡張 $ext が読み込まれていません"
+              missing=1
+            fi
+          done
+          exit "$missing"
 
       - name: Install test dependencies
         run: composer update --no-interaction --no-progress

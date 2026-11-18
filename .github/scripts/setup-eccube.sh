@@ -67,6 +67,14 @@ echo "::group::EC-CUBE に CLI を組み込む"
 cd "$ECCUBE_ROOT"
 if [ -n "${PLATFORM_PHP:-}" ]; then
     composer config platform.php "$PLATFORM_PHP"
+    # EC-CUBE の require-dev (テスト用) は CLI のテストに要らない。2.17 の composer.lock にある
+    # fzaninotto/faker や php5friends/phpunit48 は PHP 8 を許さないので、残すと PHP 8.0 で依存を解決できない
+    if [ -f composer.json ]; then
+        mapfile -t DEV_PACKAGES < <(jq -r '."require-dev" // {} | keys[]' composer.json)
+        if [ "${#DEV_PACKAGES[@]}" -gt 0 ]; then
+            composer remove --dev --no-update "${DEV_PACKAGES[@]}"
+        fi
+    fi
 fi
 # vendor の場所は 2.17 以降が data/vendor、2.13 がプロジェクト直下の vendor
 VENDOR_DIR=$(composer config vendor-dir)
