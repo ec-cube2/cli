@@ -66,7 +66,12 @@ class InstallTest extends IntegrationTestCase
     private function dbType(): string
     {
         $config = file_get_contents(self::$eccubeRoot . '/data/config/config.php');
-        $this->assertSame(1, preg_match("/define\\('DB_TYPE', '([a-z]+)'\\)/", $config, $m), 'config.php から DB_TYPE を読めません');
+        // EC-CUBE 2.25 までは define('DB_TYPE', ...)、本家 master は SC_Initial_Ex::defineIfNotDefined('DB_TYPE', ...)
+        $this->assertSame(
+            1,
+            preg_match("/define(?:IfNotDefined)?\\('DB_TYPE', '([a-z]+)'\\)/", $config, $m),
+            'config.php から DB_TYPE を読めません'
+        );
 
         return $m[1];
     }

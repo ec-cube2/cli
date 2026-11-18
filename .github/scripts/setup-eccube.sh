@@ -6,7 +6,17 @@
 #   .github/scripts/setup-eccube.sh <pgsql|mysql>
 #
 # 環境変数 (括弧内は既定値):
-#   ECCUBE_REF  取得する EC-CUBE のタグまたはブランチ (eccube-2.25.0)
+#   ECCUBE_VERSION
+#               composer create-project で取得する ec-cube2/ec-cube2 のバージョン (2.25.0.1)。
+#               ec-cube2/ec-cube2 は EC-CUBE 本家のタグにインストール手順のパッチを当てたもの
+#               (2.13.5.1 / 2.17.2.1 / 2.25.0.1 など。https://github.com/ec-cube2/ec-cube2)
+#   ECCUBE_REF  指定すると、ECCUBE_VERSION の代わりに EC-CUBE 本家 (EC-CUBE/ec-cube2) のこのブランチまたは
+#               タグを git clone する。本家の master など、ec-cube2/ec-cube2 に無いものを試すときに使う
+#               (EC-CUBE 2.17 以降のみ。2.13 の eccube_install.sh は別ホストの DB に入れられない)
+#   ECCUBE_REPOSITORY
+#               ECCUBE_VERSION の取得に使う Composer のリポジトリ (create-project の --repository に渡す)。
+#               公開前の ec-cube2/ec-cube2 のブランチを試すときに
+#               '{"type": "vcs", "url": "<ec-cube2/ec-cube2 のクローン>"}' と ECCUBE_VERSION=dev-<ブランチ> を指定する
 #   WORK_DIR    作業ディレクトリ (<CLI のルート>/build)。EC-CUBE は $WORK_DIR/ec-cube に置く
 #   DBSERVER / DBPORT / DBNAME / DBUSER / DBPASS
 #               EC-CUBE の eccube_install.sh にそのまま渡す DB 接続情報
@@ -32,7 +42,9 @@ case "$DB_TYPE" in
 esac
 
 CLI_DIR=$(cd "$(dirname "$0")/../.." && pwd)
-ECCUBE_REF=${ECCUBE_REF:-eccube-2.25.0}
+ECCUBE_VERSION=${ECCUBE_VERSION:-2.25.0.1}
+ECCUBE_REF=${ECCUBE_REF:-}
+ECCUBE_REPOSITORY=${ECCUBE_REPOSITORY:-}
 WORK_DIR=${WORK_DIR:-$CLI_DIR/build}
 ECCUBE_ROOT=$WORK_DIR/ec-cube
 CLI_SRC=$WORK_DIR/cli-src
@@ -42,11 +54,23 @@ CLI_VERSION=1.4.99
 
 mkdir -p "$WORK_DIR"
 
-echo "::group::EC-CUBE ${ECCUBE_REF} の取得"
-if [ ! -d "$ECCUBE_ROOT/.git" ]; then
+if [ -n "$ECCUBE_REF" ]; then
+    echo "::group::EC-CUBE ${ECCUBE_REF} の取得 (EC-CUBE/ec-cube2 を git clone)"
+else
+    echo "::group::EC-CUBE ${ECCUBE_VERSION} の取得 (ec-cube2/ec-cube2 を composer create-project)"
+fi
+if [ -f "$ECCUBE_ROOT/eccube_install.sh" ]; then
+    echo "取得済みの $ECCUBE_ROOT を使います"
+elif [ -n "$ECCUBE_REF" ]; then
     git clone --depth 1 --branch "$ECCUBE_REF" https://github.com/EC-CUBE/ec-cube2.git "$ECCUBE_ROOT"
 else
-    echo "取得済みの $ECCUBE_ROOT を使います"
+    # 依存パッケージは CLI を組み込むときに入れる (PLATFORM_PHP を反映させるため)。
+    # 2.13 の composer.json は php ^5.2 を要求するので、Composer を動かす PHP の版は確認しない
+    CREATE_PROJECT_ARGS=(--no-interaction --no-progress --no-install --ignore-platform-req=php)
+    if [ -n "$ECCUBE_REPOSITORY" ]; then
+        CREATE_PROJECT_ARGS+=(--repository="$ECCUBE_REPOSITORY")
+    fi
+    composer create-project "${CREATE_PROJECT_ARGS[@]}" "ec-cube2/ec-cube2:${ECCUBE_VERSION}" "$ECCUBE_ROOT"
 fi
 echo "::endgroup::"
 
@@ -90,34 +114,6 @@ echo "::endgroup::"
 echo "::group::DB の初期化 (EC-CUBE の eccube_install.sh)"
 # CLI のテストとは独立に、EC-CUBE 公式の手順でインストール済みの状態を作る。
 # data/config/config.php もここで生成される。
-# eccube_install.sh の中の ${...} を文字どおりに扱うため、以下はシングルクォートで書いている
-# shellcheck disable=SC2016
-if ! grep -q 'DBPORT=${DBPORT:-' eccube_install.sh; then
-    # 2.13 の eccube_install.sh は、PostgreSQL に sudo -u postgres で接続し、ポートを固定し、
-    # MySQL 5.7.5 で削除された storage_engine を設定する。また、MySQL の DB を文字コードを指定せずに作るので、
-    # サーバーの既定が latin1 (GitHub Actions のサービスコンテナの MySQL 5.6) だと日本語が化ける。
-    # 2.17 で直された箇所と同じように書き換える
-    git checkout -- eccube_install.sh
-    # shellcheck disable=SC2016
-    sed -i \
-        -e 's/sudo -u ${PGUSER} //g' \
-        -e 's/^\( *\)DBPORT=5432$/\1DBPORT=${DBPORT:-5432}/' \
-        -e 's/^\( *\)DBPORT=3306$/\1DBPORT=${DBPORT:-3306}/' \
-        -e '/^ *DBSERVER="127.0.0.1"$/d' \
-        -e 's/${PSQL} -U/${PSQL} -h ${DBSERVER} -p ${DBPORT} -U/g' \
-        -e 's/${DROPDB} ${DBNAME}/${DROPDB} -h ${DBSERVER} -p ${DBPORT} -U ${DBUSER} ${DBNAME}/' \
-        -e 's/${CREATEDB} -U/${CREATEDB} -h ${DBSERVER} -p ${DBPORT} -U/' \
-        -e 's/${MYSQL} -u/${MYSQL} -h ${DBSERVER} -P ${DBPORT} -u/g' \
-        -e 's/SET SESSION storage_engine/SET SESSION default_storage_engine/' \
-        -e 's/\(-e "create database .*\)"$/\1 DEFAULT COLLATE=utf8_general_ci"/' \
-        -e 's|${PASSOPT} ${DBNAME} < ${SQL_DIR}/insert_data.sql|--default-character-set=utf8 &|' \
-        eccube_install.sh
-    git diff --stat -- eccube_install.sh
-fi
-if [ "$DB_TYPE" = pgsql ]; then
-    # 2.17 以降の eccube_install.sh は自分で設定する。2.13 のために先に渡しておく
-    export PGPASSWORD=${PGPASSWORD:-${DBPASS:-password}}
-fi
 bash ./eccube_install.sh "$DB_TYPE"
 echo "::endgroup::"
 

@@ -97,7 +97,12 @@ jobs:
       matrix:
         php: ['7.4', '8.1', '8.4']
         db: [pgsql, mysql]
-        eccube: [eccube-2.25.0]
+        # ec-cube2/ec-cube2 (EC-CUBE 本家のタグにインストール手順のパッチを当てたもの) のバージョン
+        eccube: ['2.25.0.1']
+        # EC-CUBE 本家の master (次のリリース) は ec-cube2/ec-cube2 に無いので、ref で git clone する
+        include:
+          - { php: '8.4', db: pgsql, eccube: master, ref: master }
+          - { php: '8.4', db: mysql, eccube: master, ref: master }
     services:
       postgres:
         image: postgres:16
@@ -123,7 +128,8 @@ jobs:
           --health-cmd "mysqladmin ping -h 127.0.0.1 -ppassword"
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      ECCUBE_REF: ${{ matrix.eccube }}
+      ECCUBE_VERSION: ${{ matrix.eccube }}
+      ECCUBE_REF: ${{ matrix.ref }}
       DBSERVER: 127.0.0.1
       DBPORT: ${{ matrix.db == 'pgsql' && '15432' || '13306' }}
       DBNAME: eccube_db
@@ -187,24 +193,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # eccube は ec-cube2/ec-cube2 のバージョン (2.13.5.1 は本家 2.13.5-p2、2.17.2.1 は 2.17.2-p2 にパッチを当てたもの)。
           # 2.13 は PHP 5.3〜5.6 向け。CLI は Symfony 3.4 以上が要るので PHP 5.5.9 以上になる。
           # 2.13 は接続時に MySQL 5.7.5 で削除された storage_engine を設定するので MySQL 5.6 を使う。
           # 2.13 の MDB2 は MySQL に ext/mysql で接続するが、setup-php の PHP 5.6 (ubuntu-24.04) には
           # ext/mysql が無い。そのため 2.13 × MySQL は PHP 5.5 で確認する
           # (PHP 5.6 × MySQL 5.6 は、ext/mysql を入れた Docker の php:5.6-cli で手元で確認した)。
           # Composer 2.3 以降が生成する autoload は PHP 5.6 未満で動かないので、PHP 5.5 では Composer 2.2 LTS を使う
-          - { eccube: eccube-2.13.5-p2, php: '5.5', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
-          - { eccube: eccube-2.13.5-p2, php: '5.5', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
-          - { eccube: eccube-2.13.5-p2, php: '5.6', db: pgsql, mysql: 'mysql:5.6', ext: mysqli }
+          - { eccube: '2.13.5.1', php: '5.5', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: '2.13.5.1', php: '5.5', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: '2.13.5.1', php: '5.6', db: pgsql, mysql: 'mysql:5.6', ext: mysqli }
           # 2.17 は PHP 5.4〜8.0 向け (EC-CUBE の CI と同じく MySQL 5.7)
-          - { eccube: eccube-2.17.2-p2, php: '5.6', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '5.6', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '7.1', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '7.1', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '7.4', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '7.4', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '8.0', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
-          - { eccube: eccube-2.17.2-p2, php: '8.0', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '5.6', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '5.6', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.1', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.1', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.4', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.4', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '8.0', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '8.0', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
     services:
       postgres:
         # 2.13 の MDB2 は PostgreSQL 12 で削除された pg_attrdef.adsrc を参照する
@@ -231,7 +238,7 @@ jobs:
           --health-cmd "mysqladmin ping -h 127.0.0.1 -ppassword"
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      ECCUBE_REF: ${{ matrix.eccube }}
+      ECCUBE_VERSION: ${{ matrix.eccube }}
       DBSERVER: 127.0.0.1
       DBPORT: ${{ matrix.db == 'pgsql' && '15432' || '13306' }}
       DBNAME: eccube_db

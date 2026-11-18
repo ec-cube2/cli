@@ -125,6 +125,10 @@ $ ECCUBE_ROOT=$PWD/build/ec-cube vendor/bin/phpunit --testsuite integration
 結合テストは DB を作り直すので、再実行するときはセットアップからやり直してください。
 接続情報などの環境変数は `.github/scripts/setup-eccube.sh` の冒頭を参照してください。
 
+EC-CUBE は [ec-cube2/ec-cube2](https://github.com/ec-cube2/ec-cube2) から `composer create-project` で取得します (既定は `ECCUBE_VERSION=2.25.0.1`)。
+ec-cube2/ec-cube2 は、EC-CUBE 本家のタグに、別ホストの DB にインストールできるようにするパッチを当てたものです。
+本家の master など ec-cube2/ec-cube2 に無いものは、`ECCUBE_REF=master` のようにブランチかタグを指定すると、本家を `git clone` して使います (EC-CUBE 2.17 以降)。
+
 ### 古い EC-CUBE / PHP での確認
 
 EC-CUBE 2.13 / 2.17 と古い PHP での確認では、PHPUnit は新しい PHP で実行し、CLI と EC-CUBE だけを古い PHP で動かします。
@@ -132,7 +136,7 @@ EC-CUBE 2.13 / 2.17 と古い PHP での確認では、PHPUnit は新しい PHP 
 Composer は新しい PHP で動かすので、`PLATFORM_PHP` に CLI を動かす PHP のバージョンを指定して、依存関係をそのバージョンに合わせます。
 
 ```
-$ WORK_DIR=$PWD/build/213 ECCUBE_REF=eccube-2.13.5-p2 PLATFORM_PHP=5.6.40 \
+$ WORK_DIR=$PWD/build/213 ECCUBE_VERSION=2.13.5.1 PLATFORM_PHP=5.6.40 \
     DBSERVER=127.0.0.1 DBPORT=5432 .github/scripts/setup-eccube.sh pgsql
 
 $ ECCUBE_PHP=/usr/bin/php5.6 ECCUBE_ROOT=$PWD/build/213/ec-cube vendor/bin/phpunit --testsuite integration
