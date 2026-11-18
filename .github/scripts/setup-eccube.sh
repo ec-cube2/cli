@@ -94,7 +94,9 @@ echo "::group::DB の初期化 (EC-CUBE の eccube_install.sh)"
 # shellcheck disable=SC2016
 if ! grep -q 'DBPORT=${DBPORT:-' eccube_install.sh; then
     # 2.13 の eccube_install.sh は、PostgreSQL に sudo -u postgres で接続し、ポートを固定し、
-    # MySQL 5.7.5 で削除された storage_engine を設定する。2.17 で直された箇所と同じように書き換える
+    # MySQL 5.7.5 で削除された storage_engine を設定する。また、MySQL の DB を文字コードを指定せずに作るので、
+    # サーバーの既定が latin1 (GitHub Actions のサービスコンテナの MySQL 5.6) だと日本語が化ける。
+    # 2.17 で直された箇所と同じように書き換える
     git checkout -- eccube_install.sh
     # shellcheck disable=SC2016
     sed -i \
@@ -107,6 +109,8 @@ if ! grep -q 'DBPORT=${DBPORT:-' eccube_install.sh; then
         -e 's/${CREATEDB} -U/${CREATEDB} -h ${DBSERVER} -p ${DBPORT} -U/' \
         -e 's/${MYSQL} -u/${MYSQL} -h ${DBSERVER} -P ${DBPORT} -u/g' \
         -e 's/SET SESSION storage_engine/SET SESSION default_storage_engine/' \
+        -e 's/\(-e "create database .*\)"$/\1 DEFAULT COLLATE=utf8_general_ci"/' \
+        -e 's|${PASSOPT} ${DBNAME} < ${SQL_DIR}/insert_data.sql|--default-character-set=utf8 &|' \
         eccube_install.sh
     git diff --stat -- eccube_install.sh
 fi
