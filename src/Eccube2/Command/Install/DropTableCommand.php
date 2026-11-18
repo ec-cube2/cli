@@ -43,7 +43,7 @@ class DropTableCommand extends Command
 
         $io->text('テーブルの削除を開始します。');
 
-        $this->install->createTable();
+        $this->install->dropTable();
 
         $io->success('テーブルの削除に成功しました。');
 

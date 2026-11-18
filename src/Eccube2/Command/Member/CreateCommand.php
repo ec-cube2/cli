@@ -100,7 +100,7 @@ class CreateCommand extends Command
         }
 
         // authority
-        if ($input->getOption('authority')) {
+        if ($input->getOption('authority') !== null) {
             $member['authority'] = $input->getOption('authority');
         } else {
             $authority = $io->choice('権限を選択してください。', $this->member->arrAUTHORITY);
@@ -108,7 +108,7 @@ class CreateCommand extends Command
         }
 
         // work
-        if ($input->getOption('work')) {
+        if ($input->getOption('work') !== null) {
             $member['work'] = $input->getOption('work');
         } else {
             $work = $io->choice('稼働/非稼働を選択してください。', $this->member->arrWORK);

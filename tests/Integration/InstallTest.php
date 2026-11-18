@@ -103,6 +103,8 @@ class InstallTest extends IntegrationTestCase
         $result = $this->eccube(['install:create-table', '--yes']);
 
         $this->assertTrue($this->tableExists('dtb_baseinfo'), 'テーブルが作成されていません' . "\n" . $result->describe());
+        // dtb_member は MySQL 8 の予約語 rank を列に持つ。SQL のエラーを無視していると、このテーブルだけ作られない
+        $this->assertTrue($this->tableExists('dtb_member'), 'dtb_member が作成されていません' . "\n" . $result->describe());
         $this->assertCommandSucceeded($result);
     }
 

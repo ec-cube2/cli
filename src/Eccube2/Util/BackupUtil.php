@@ -23,7 +23,7 @@ class BackupUtil
             $this->directory = BACKUP_REALDIR;
         }
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/system/LC_Page_Admin_System_Bkup_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/system/LC_Page_Admin_System_Bkup_Ex.php');
         $this->page = new \LC_Page_Admin_System_Bkup_Ex();
         $this->page->bkup_ext = $this->ext;
         $this->page->bkup_dir = $this->directory;

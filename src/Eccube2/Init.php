@@ -56,6 +56,23 @@ class Init
         return new self;
     }
 
+    /**
+     * data/class_extends/ 以下の _Ex ファイルを、存在する場合だけ読み込む。
+     *
+     * EC-CUBE 2.25 で page_extends/ 以下のほとんどの _Ex ファイルが削除され、
+     * 代わりにオートローダーが _Ex クラスを用意するようになった (EC-CUBE/ec-cube2#526)。
+     * 2.17 以前では従来どおりファイルを読み込む。
+     *
+     * @param string $path CLASS_EX_REALDIR からの相対パス
+     */
+    public static function requireClassEx($path)
+    {
+        $file = CLASS_EX_REALDIR . $path;
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+
     public static function setErrorHandler()
     {
         set_error_handler(

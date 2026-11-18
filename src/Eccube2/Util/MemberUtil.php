@@ -23,13 +23,13 @@ class MemberUtil
             throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/system/LC_Page_Admin_System_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/system/LC_Page_Admin_System_Ex.php');
         $this->page = new \LC_Page_Admin_System_Ex();
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/system/LC_Page_Admin_System_Input_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/system/LC_Page_Admin_System_Input_Ex.php');
         $this->pageInput = new \LC_Page_Admin_System_Input_Ex();
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/system/LC_Page_Admin_System_Delete_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/system/LC_Page_Admin_System_Delete_Ex.php');
         $this->pageDelete = new \LC_Page_Admin_System_Delete_Ex();
 
         $masterData = new \SC_DB_MasterData_Ex();

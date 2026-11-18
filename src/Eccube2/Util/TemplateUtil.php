@@ -13,7 +13,7 @@ class TemplateUtil
             throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/design/LC_Page_Admin_Design_Template_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/design/LC_Page_Admin_Design_Template_Ex.php');
         $this->page = new \LC_Page_Admin_Design_Template_Ex();
     }
 
