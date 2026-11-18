@@ -9,17 +9,14 @@ EC-CUBE2 を CLI で管理できるようになります。
 $ composer require ec-cube2/cli
 ```
 
-EC-CUBE 2.17.x プロジェクトにインストールできない場合は次を試してみてください：
+動作に必要なもの: PHP 5.5.9 以上、Symfony 3.4 / 4.4 / 5.4 (EC-CUBE 2.13 / 2.17 / 2.25 で確認しています)。
+
+EC-CUBE 2.17.x のプロジェクトは `composer.json` の `config.platform.php` が `5.4.16` になっています。
+そのままでは依存関係を解決できないので、`config.platform.php` を実際に動かす PHP のバージョン (5.5.9 以上) に変えてからインストールしてください。
 
 ```
-# PHP バージョン要件 (config.platform.php) を {"php": "5.5.9"} にする。
-$ vi composer.json
-
-# codeception を除去する。
-$ composer remove codeception/codeception
-
-# symfony/yaml を更新しつつインストールする。
-$ composer require ec-cube2/cli symfony/yaml --update-with-all-dependencies
+$ composer config platform.php 5.6.40
+$ composer require ec-cube2/cli --update-with-all-dependencies
 ```
 
 ## Usage
@@ -127,3 +124,20 @@ $ ECCUBE_ROOT=$PWD/build/ec-cube vendor/bin/phpunit --testsuite integration
 
 結合テストは DB を作り直すので、再実行するときはセットアップからやり直してください。
 接続情報などの環境変数は `.github/scripts/setup-eccube.sh` の冒頭を参照してください。
+
+### 古い EC-CUBE / PHP での確認
+
+EC-CUBE 2.13 / 2.17 と古い PHP での確認では、PHPUnit は新しい PHP で実行し、CLI と EC-CUBE だけを古い PHP で動かします。
+環境変数 `ECCUBE_PHP` に、CLI を動かす PHP のコマンドを指定します。
+Composer は新しい PHP で動かすので、`PLATFORM_PHP` に CLI を動かす PHP のバージョンを指定して、依存関係をそのバージョンに合わせます。
+
+```
+$ WORK_DIR=$PWD/build/213 ECCUBE_REF=eccube-2.13.5-p2 PLATFORM_PHP=5.6.40 \
+    DBSERVER=127.0.0.1 DBPORT=5432 .github/scripts/setup-eccube.sh pgsql
+
+$ ECCUBE_PHP=/usr/bin/php5.6 ECCUBE_ROOT=$PWD/build/213/ec-cube vendor/bin/phpunit --testsuite integration
+```
+
+- EC-CUBE 2.13 の MDB2 は PostgreSQL 12 で削除された `pg_attrdef.adsrc` を参照するので、PostgreSQL 11 以前を使います。
+- EC-CUBE 2.13 は接続時に MySQL 5.7.5 で削除された `storage_engine` を設定するので、MySQL 5.6 以前を使います。
+- `ECCUBE_PHP` には Docker で動かす PHP を呼ぶスクリプトも指定できます (EC-CUBE のディレクトリを同じパスでマウントし、DB にはホストのネットワークで接続します)。

@@ -90,7 +90,9 @@ class InstallUtil
      */
     public function dropTable()
     {
-        $this->executeSQL(INSTALL_REALDIR . 'sql/drop_table.sql');
+        // 2.17 以前の drop_table.sql には IF EXISTS が無く、作られないテーブルも含む。
+        // Web インストーラ (html/install/index.php) と同じく、削除のエラーは無視する
+        $this->executeSQL(INSTALL_REALDIR . 'sql/drop_table.sql', true);
     }
 
     /**
@@ -129,11 +131,11 @@ class InstallUtil
     }
 
     /**
-     * @param $filepath
-     * @param $arrDsn
+     * @param string $filepath
+     * @param bool $ignoreErrors true ならエラーになった文を飛ばして続ける
      * @throws \Exception
      */
-    public function executeSQL($filepath)
+    public function executeSQL($filepath, $ignoreErrors = false)
     {
         if (!file_exists($filepath)) {
             throw new \Exception('スクリプトファイルが見つかりません');
@@ -162,9 +164,12 @@ class InstallUtil
             try {
                 $result = $objDB->query($val);
             } catch (\Exception $e) {
+                if ($ignoreErrors) {
+                    continue;
+                }
                 throw new \Exception($e->getMessage() . "\n" . trim($val), 0, $e);
             }
-            if (\PEAR::isError($result)) {
+            if (\PEAR::isError($result) && !$ignoreErrors) {
                 throw new \Exception($result->getMessage() . ' ' . $result->getUserInfo() . "\n" . trim($val));
             }
         }

@@ -10,6 +10,10 @@
 #   WORK_DIR    作業ディレクトリ (<CLI のルート>/build)。EC-CUBE は $WORK_DIR/ec-cube に置く
 #   DBSERVER / DBPORT / DBNAME / DBUSER / DBPASS
 #               EC-CUBE の eccube_install.sh にそのまま渡す DB 接続情報
+#   PLATFORM_PHP
+#               指定すると EC-CUBE の composer.json の config.platform.php をこの値にする。
+#               CLI を動かす PHP と Composer を動かす PHP が違うとき (古い PHP での確認) に、
+#               CLI を動かす PHP のバージョンを指定する
 #
 # 実行後、テストは ECCUBE_ROOT=$WORK_DIR/ec-cube を指定して実行する。
 # GitHub Actions 上では ECCUBE_ROOT を $GITHUB_ENV に書き出す。
@@ -61,10 +65,15 @@ echo "::endgroup::"
 
 echo "::group::EC-CUBE に CLI を組み込む"
 cd "$ECCUBE_ROOT"
+if [ -n "${PLATFORM_PHP:-}" ]; then
+    composer config platform.php "$PLATFORM_PHP"
+fi
+# vendor の場所は 2.17 以降が data/vendor、2.13 がプロジェクト直下の vendor
+VENDOR_DIR=$(composer config vendor-dir)
 composer config repositories.cli-under-test \
     "{\"type\": \"path\", \"url\": \"${CLI_SRC}\", \"options\": {\"symlink\": false, \"versions\": {\"ec-cube2/cli\": \"${CLI_VERSION}\"}}}"
 # path リポジトリはソースが変わってもバージョンが同じだと入れ直さないため、既存のコピーを消してから入れる
-rm -rf data/vendor/ec-cube2/cli
+rm -rf "${VENDOR_DIR}/ec-cube2/cli"
 composer require --no-interaction --no-progress --update-with-all-dependencies "ec-cube2/cli:${CLI_VERSION}"
 composer show ec-cube2/cli symfony/console symfony/dependency-injection symfony/event-dispatcher symfony/config symfony/yaml 2>/dev/null \
     | grep -E '^(name|versions)' || true
@@ -73,6 +82,30 @@ echo "::endgroup::"
 echo "::group::DB の初期化 (EC-CUBE の eccube_install.sh)"
 # CLI のテストとは独立に、EC-CUBE 公式の手順でインストール済みの状態を作る。
 # data/config/config.php もここで生成される。
+# eccube_install.sh の中の ${...} を文字どおりに扱うため、以下はシングルクォートで書いている
+# shellcheck disable=SC2016
+if ! grep -q 'DBPORT=${DBPORT:-' eccube_install.sh; then
+    # 2.13 の eccube_install.sh は、PostgreSQL に sudo -u postgres で接続し、ポートを固定し、
+    # MySQL 5.7.5 で削除された storage_engine を設定する。2.17 で直された箇所と同じように書き換える
+    git checkout -- eccube_install.sh
+    # shellcheck disable=SC2016
+    sed -i \
+        -e 's/sudo -u ${PGUSER} //g' \
+        -e 's/^\( *\)DBPORT=5432$/\1DBPORT=${DBPORT:-5432}/' \
+        -e 's/^\( *\)DBPORT=3306$/\1DBPORT=${DBPORT:-3306}/' \
+        -e '/^ *DBSERVER="127.0.0.1"$/d' \
+        -e 's/${PSQL} -U/${PSQL} -h ${DBSERVER} -p ${DBPORT} -U/g' \
+        -e 's/${DROPDB} ${DBNAME}/${DROPDB} -h ${DBSERVER} -p ${DBPORT} -U ${DBUSER} ${DBNAME}/' \
+        -e 's/${CREATEDB} -U/${CREATEDB} -h ${DBSERVER} -p ${DBPORT} -U/' \
+        -e 's/${MYSQL} -u/${MYSQL} -h ${DBSERVER} -P ${DBPORT} -u/g' \
+        -e 's/SET SESSION storage_engine/SET SESSION default_storage_engine/' \
+        eccube_install.sh
+    git diff --stat -- eccube_install.sh
+fi
+if [ "$DB_TYPE" = pgsql ]; then
+    # 2.17 以降の eccube_install.sh は自分で設定する。2.13 のために先に渡しておく
+    export PGPASSWORD=${PGPASSWORD:-${DBPASS:-password}}
+fi
 bash ./eccube_install.sh "$DB_TYPE"
 echo "::endgroup::"
 
