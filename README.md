@@ -9,7 +9,7 @@ EC-CUBE2 を CLI で管理できるようになります。
 $ composer require ec-cube2/cli
 ```
 
-動作に必要なもの: PHP 5.5.9 以上、Symfony 3.4 / 4.4 / 5.4 (EC-CUBE 2.13 / 2.17 / 2.25 で確認しています)。
+動作に必要なものは [Requirements](#requirements) を参照してください。
 
 EC-CUBE 2.17.x のプロジェクトは `composer.json` の `config.platform.php` が `5.4.16` になっています。
 そのままでは依存関係を解決できないので、`config.platform.php` を実際に動かす PHP のバージョン (5.5.9 以上) に変えてからインストールしてください。
@@ -91,7 +91,9 @@ Available commands:
 
 ## Requirements
 
-PHP 5.3.3 以上
+- PHP 5.5.9 以上
+- Symfony 3.4 / 4.4 / 5.4
+- EC-CUBE 2.13 / 2.17 / 2.25 で確認しています
 
 
 ## Info
