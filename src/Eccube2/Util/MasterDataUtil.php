@@ -13,7 +13,7 @@ class MasterDataUtil
             throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/system/LC_Page_Admin_System_Masterdata_Ex.php';
+        \Eccube2\Init::requireClassEx('page_extends/admin/system/LC_Page_Admin_System_Masterdata_Ex.php');
         $this->page = new \LC_Page_Admin_System_Masterdata_Ex();
     }
 

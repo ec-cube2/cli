@@ -154,8 +154,41 @@ class InstallUtil
                 continue;
             }
 
-            $objDB->query($val);
+            if (DB_TYPE === 'mysqli') {
+                $val = $this->quoteMysqlReservedWords($val);
+            }
+
+            // PHP 8.1 以降の mysqli はエラー時に mysqli_sql_exception を投げ、それより前は MDB2_Error を返す
+            try {
+                $result = $objDB->query($val);
+            } catch (\Exception $e) {
+                throw new \Exception($e->getMessage() . "\n" . trim($val), 0, $e);
+            }
+            if (\PEAR::isError($result)) {
+                throw new \Exception($result->getMessage() . ' ' . $result->getUserInfo() . "\n" . trim($val));
+            }
         }
+    }
+
+    /**
+     * MySQL 8 で予約語になった rank を引用符で囲む。
+     *
+     * EC-CUBE の Web インストーラーと同じく SC_DB_DBFactory_MYSQL::sfChangeReservedWords() を使う。
+     * このメソッドが無い古い EC-CUBE では同じ置換を行う。
+     *
+     * @param string $sql
+     * @return string
+     */
+    public function quoteMysqlReservedWords($sql)
+    {
+        $dbFactory = \SC_DB_DBFactory_Ex::getInstance('mysqli');
+        if (method_exists($dbFactory, 'sfChangeReservedWords')) {
+            return $dbFactory->sfChangeReservedWords($sql);
+        }
+
+        $sql = preg_replace('/(^|[^\w])RANK([^\w]|$)/i', '$1`RANK`$2', $sql);
+
+        return str_replace('``', '`', $sql);
     }
 
     /**

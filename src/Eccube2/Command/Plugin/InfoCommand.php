@@ -99,7 +99,7 @@ class InfoCommand extends Command
         $io->text($plugin['priority']);
 
         $io->section('Enable');
-        $io->text($plugin['enable'] ? 'o' : 'x');
+        $io->text($plugin['enable'] == PLUGIN_ENABLE_TRUE ? 'o' : 'x');
 
         $io->section('Create Date');
         $io->text($plugin['create_date']);

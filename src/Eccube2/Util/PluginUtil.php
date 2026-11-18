@@ -17,7 +17,14 @@ class PluginUtil
 
         $this->dir = rtrim(PLUGIN_UPLOAD_REALDIR, '/');
 
-        require_once CLASS_EX_REALDIR . 'page_extends/admin/ownersstore/LC_Page_Admin_OwnersStore_Ex.php';
+        // Web の管理画面と同じく、プラグインのクラスファイルを読み込む前に SC_Helper_Plugin を生成しておく。
+        // 未生成のまま有効なプラグインのクラスファイルを読み込むと、SC_Plugin_Base のオートロード中に
+        // SC_Helper_Plugin::load() が同じクラスファイルを読み込もうとし、定義前のクラスを new して Fatal error になる。
+        // SC_Helper_Plugin は SC_Query のインスタンスが無いと生成されないので、先に SC_Query を生成する。
+        \SC_Query_Ex::getSingletonInstance();
+        \SC_Helper_Plugin_Ex::getSingletonInstance();
+
+        \Eccube2\Init::requireClassEx('page_extends/admin/ownersstore/LC_Page_Admin_OwnersStore_Ex.php');
         $this->page = new \LC_Page_Admin_OwnersStore_Ex();
     }
 

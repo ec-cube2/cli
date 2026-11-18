@@ -48,7 +48,7 @@ class ListCommand extends Command
             $rows[] = array(
                 $plugin['plugin_code'],
                 mb_strimwidth($plugin['plugin_name'], 0, 35, '...'),
-                $plugin['enable'] ? 'o' : 'x',
+                $plugin['enable'] == PLUGIN_ENABLE_TRUE ? 'o' : 'x',
             );
         }
 
