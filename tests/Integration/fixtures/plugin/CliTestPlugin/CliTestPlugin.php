@@ -1,0 +1,10 @@
+<?php
+
+/**
+ * ec-cube2/cli の結合テスト用プラグイン。
+ *
+ * install / uninstall / enable / disable は SC_Plugin_Base の既定の実装 (何もしない) を使う。
+ */
+class CliTestPlugin extends SC_Plugin_Base
+{
+}

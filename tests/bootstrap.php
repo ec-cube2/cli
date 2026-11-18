@@ -1,4 +1,3 @@
 <?php
 
-$loader = require __DIR__ . '/../src/bootstrap.php';
-$loader->add('Eccube2\Test', __DIR__);
+require __DIR__ . '/../vendor/autoload.php';
