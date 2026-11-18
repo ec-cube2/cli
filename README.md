@@ -102,3 +102,28 @@ PHP 5.3.3 以上
 それぞれのコマンドが利用する機能は `Eccube2\Util` にまとめています。
 
 追加機能の要望やバグ報告は Issue からお願いします。
+
+
+## Development
+
+テストは PHP 7.2.5 以上で実行します。
+
+```
+$ composer update
+
+# EC-CUBE 本体なしで実行できるテスト (Application の起動とコマンドの登録)
+$ vendor/bin/phpunit --testsuite structure
+```
+
+結合テストは EC-CUBE 2 に CLI を組み込み、コマンドを別プロセスで実行します。
+DB (PostgreSQL または MySQL) を用意してから、次のように実行します。
+
+```
+# EC-CUBE を build/ec-cube に取得して CLI を組み込み、eccube_install.sh で DB を初期化する
+$ DBSERVER=127.0.0.1 DBPORT=5432 .github/scripts/setup-eccube.sh pgsql
+
+$ ECCUBE_ROOT=$PWD/build/ec-cube vendor/bin/phpunit --testsuite integration
+```
+
+結合テストは DB を作り直すので、再実行するときはセットアップからやり直してください。
+接続情報などの環境変数は `.github/scripts/setup-eccube.sh` の冒頭を参照してください。

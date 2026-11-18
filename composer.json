@@ -11,6 +11,9 @@
     "autoload": {
         "psr-4": {"Eccube2\\": "src/Eccube2/"}
     },
+    "autoload-dev": {
+        "psr-4": {"Eccube2\\Tests\\": "tests/"}
+    },
     "require": {
         "php": ">=5.3.3",
         "ext-mbstring": "*",
@@ -20,8 +23,8 @@
         "symfony/dependency-injection": "^2.8|^3.4|^4.4|^5.4"
     },
     "require-dev": {
-        "composer/composer": "^1.0",
-        "ec-cube2/ec-cube2": "^2.13"
+        "phpunit/phpunit": "^8.5.40 || ^9.6",
+        "symfony/yaml": "^2.8|^3.4|^4.4|^5.4"
     },
     "bin": [
         "bin/eccube"

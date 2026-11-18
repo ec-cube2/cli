@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- PHPUnit 8.5 (PHP 7.2) と 9.6 の両方で読める書式にしている -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         executionOrder="default"
+>
+    <testsuites>
+        <!-- EC-CUBE 本体なしで実行できるテスト -->
+        <testsuite name="structure">
+            <directory>tests/Structure</directory>
+        </testsuite>
+        <!--
+            EC-CUBE 2 に組み込んだ CLI を別プロセスで実行するテスト。
+            環境変数 ECCUBE_ROOT に EC-CUBE のルートディレクトリを指定する (未指定ならスキップ)。
+            DB を作り直すテストを最後に実行するため、ファイルを順番に列挙している。
+        -->
+        <testsuite name="integration">
+            <file>tests/Integration/ApplicationTest.php</file>
+            <file>tests/Integration/InfoTest.php</file>
+            <file>tests/Integration/UtilTest.php</file>
+            <file>tests/Integration/CacheTest.php</file>
+            <file>tests/Integration/ParameterTest.php</file>
+            <file>tests/Integration/TemplateTest.php</file>
+            <file>tests/Integration/MemberTest.php</file>
+            <file>tests/Integration/PluginTest.php</file>
+            <file>tests/Integration/BackupTest.php</file>
+            <file>tests/Integration/ZipTest.php</file>
+            <file>tests/Integration/OwnersStoreTest.php</file>
+            <file>tests/Integration/InstallTest.php</file>
+        </testsuite>
+    </testsuites>
+</phpunit>
