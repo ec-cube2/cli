@@ -12,6 +12,7 @@
 namespace Eccube2\Command;
 
 use Eccube2\Init;
+use Eccube2\Util\EventDispatcherUtil;
 use Eccube2\Util\InstallUtil;
 use Eccube2\Util\MasterDataUtil;
 use Eccube2\Util\ParameterUtil;
@@ -83,7 +84,7 @@ class InstallCommand extends Command
         if (!$input->getOption('yes') && !$io->confirm('ソフトウェア使用許諾書に同意しますか？', false)) {
             $io->error('ソフトウェア使用許諾書に同意してください。');
 
-            return;
+            return 1;
         }
 
         $io->section('テーブル作成');
@@ -99,7 +100,7 @@ class InstallCommand extends Command
         if ($input->getOption('yes') || $io->confirm('初期データを作成しますか？')) {
             $io->text('初期データの作成を開始します。');
             $this->install->insertData();
-            $this->eventDispatcher->dispatch('install.insert_data');
+            EventDispatcherUtil::dispatch($this->eventDispatcher, 'install.insert_data');
             $io->success('初期データの作成に成功しました。');
         } else {
             $io->success('初期データの作成をスキップしました。');
@@ -168,11 +169,13 @@ class InstallCommand extends Command
             $io->success('インストール情報を送信しました。');
         }
 
-        $this->eventDispatcher->dispatch('install.after');
+        EventDispatcherUtil::dispatch($this->eventDispatcher, 'install.after');
 
         $io->success(array(
             'インストールが完了しました。',
             HTTPS_URL . ' からアクセスしてください。',
         ));
+
+        return 0;
     }
 }

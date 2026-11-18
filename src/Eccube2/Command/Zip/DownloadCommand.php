@@ -39,5 +39,7 @@ class DownloadCommand extends Command
         $this->zip->download();
 
         $io->success('郵便番号CSVを取得しました。');
+
+        return 0;
     }
 }

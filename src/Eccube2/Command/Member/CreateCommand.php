@@ -118,5 +118,7 @@ class CreateCommand extends Command
         $this->member->create($member);
 
         $io->success($member['name'] . ' を作成しました。');
+
+        return 0;
     }
 }

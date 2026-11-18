@@ -3,6 +3,7 @@
 namespace Eccube2\Command\Install;
 
 use Eccube2\Init;
+use Eccube2\Util\EventDispatcherUtil;
 use Eccube2\Util\InstallUtil;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -49,11 +50,13 @@ class InsertDataCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('初期データを作成しますか？')) {
-            return;
+            return 0;
         }
         $io->text('初期データの作成を開始します。');
         $this->install->insertData();
-        $this->eventDispatcher->dispatch('install.insert_data');
+        EventDispatcherUtil::dispatch($this->eventDispatcher, 'install.insert_data');
         $io->success('初期データの作成に成功しました。');
+
+        return 0;
     }
 }

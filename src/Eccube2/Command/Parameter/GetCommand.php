@@ -49,5 +49,7 @@ class GetCommand extends Command
         $value = $this->parameter->get($key);
 
         $io->block($value);
+
+        return 0;
     }
 }

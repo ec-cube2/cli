@@ -39,7 +39,7 @@ class DeleteCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
-            return;
+            return 0;
         }
 
         $name = $input->getArgument('name');
@@ -48,5 +48,7 @@ class DeleteCommand extends Command
         $this->backup->delete($name);
 
         $io->success('バックアップを削除しました。');
+
+        return 0;
     }
 }

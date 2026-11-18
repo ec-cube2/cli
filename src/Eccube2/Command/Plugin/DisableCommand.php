@@ -60,5 +60,7 @@ class DisableCommand extends Command
         } else {
             $io->success($code . ' を無効にしました');
         }
+
+        return 0;
     }
 }

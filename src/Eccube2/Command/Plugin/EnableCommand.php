@@ -60,5 +60,7 @@ class EnableCommand extends Command
         } else {
             $io->success($code . ' を有効にしました');
         }
+
+        return 0;
     }
 }

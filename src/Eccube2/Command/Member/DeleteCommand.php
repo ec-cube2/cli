@@ -41,5 +41,7 @@ class DeleteCommand extends Command
         $this->member->deleteByLoginId($loginId);
 
         $io->success($member['name'] . ' を削除しました。');
+
+        return 0;
     }
 }

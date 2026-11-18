@@ -38,7 +38,7 @@ class DropTableCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('本当に削除しますか？', false)) {
-            return;
+            return 0;
         }
 
         $io->text('テーブルの削除を開始します。');
@@ -46,5 +46,7 @@ class DropTableCommand extends Command
         $this->install->createTable();
 
         $io->success('テーブルの削除に成功しました。');
+
+        return 0;
     }
 }

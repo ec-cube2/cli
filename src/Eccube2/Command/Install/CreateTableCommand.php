@@ -38,10 +38,12 @@ class CreateTableCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         if (!$input->getOption('yes') && !$io->confirm('テーブルを作成しますか？')) {
-            return;
+            return 0;
         }
         $io->text('テーブルの作成を開始します。');
         $this->install->createTable();
         $io->success('テーブルの作成に成功しました。');
+
+        return 0;
     }
 }

@@ -57,5 +57,7 @@ class ListCommand extends Command
         $io->table(array('名称', 'メモ', '作成日'), $rows);
 
         $io->newLine();
+
+        return 0;
     }
 }

@@ -43,5 +43,7 @@ class GetCommand extends Command
         $code = $this->template->getSmartphoneTemplate();
 
         $output->writeln('    <info>' . $code . '</info>');
+
+        return 0;
     }
 }

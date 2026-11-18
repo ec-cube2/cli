@@ -47,5 +47,7 @@ class RandomStringCommand extends Command
 
         $length = $input->getArgument('length');
         $io->writeln($this->util->getRandomString($length));
+
+        return 0;
     }
 }

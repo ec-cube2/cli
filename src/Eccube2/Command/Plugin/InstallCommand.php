@@ -62,5 +62,7 @@ class InstallCommand extends Command
         } else {
             $io->success($code . ' をインストールしました');
         }
+
+        return 0;
     }
 }

@@ -41,5 +41,7 @@ class DisableCommand extends Command
         $this->member->setWorkByLoginId($loginId, 0);
 
         $io->success($member['name'] . ' を無効化しました。');
+
+        return 0;
     }
 }

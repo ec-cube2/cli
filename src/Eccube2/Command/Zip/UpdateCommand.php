@@ -68,5 +68,7 @@ class UpdateCommand extends Command
         $objQuery->commit();
 
         $io->success('郵便番号の更新が完了しました。');
+
+        return 0;
     }
 }

@@ -37,5 +37,7 @@ class CopyImageCommand extends Command
 
         $message = $this->install->copyImage();
         $io->block($message);
+
+        return 0;
     }
 }

@@ -47,5 +47,7 @@ class SetCommand extends Command
         $this->template->setPcTemplate($code);
 
         $output->writeln('    <info>設定しました。</info>');
+
+        return 0;
     }
 }

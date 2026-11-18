@@ -72,5 +72,7 @@ class InfoCommand extends Command
         $io->text($arrModule['update_date']);
 
         $io->newLine();
+
+        return 0;
     }
 }
