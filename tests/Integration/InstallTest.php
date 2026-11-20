@@ -32,11 +32,12 @@ class InstallTest extends IntegrationTestCase
     /**
      * CLI を使わずにテーブルを削除する。
      *
-     * 途中まで作られたテーブルも消せるよう、常に drop_table.sql (すべて DROP TABLE IF EXISTS) を実行する。
+     * 途中まで作られたテーブルも消せるよう、常に drop_table.sql を実行する。
+     * 2.17 以前の drop_table.sql には IF EXISTS が無いので、Web インストーラと同じくエラーは無視する。
      */
     private function dropAllTables()
     {
-        $this->executeSqlFile(self::$eccubeRoot . '/html/install/sql/drop_table.sql');
+        $this->executeSqlFile(self::$eccubeRoot . '/html/install/sql/drop_table.sql', true);
         $this->assertFalse($this->tableExists('dtb_baseinfo'), '前提: テーブルを削除できません');
     }
 
@@ -65,7 +66,12 @@ class InstallTest extends IntegrationTestCase
     private function dbType(): string
     {
         $config = file_get_contents(self::$eccubeRoot . '/data/config/config.php');
-        $this->assertSame(1, preg_match("/define\\('DB_TYPE', '([a-z]+)'\\)/", $config, $m), 'config.php から DB_TYPE を読めません');
+        // EC-CUBE 2.25 までは define('DB_TYPE', ...)、本家 master は SC_Initial_Ex::defineIfNotDefined('DB_TYPE', ...)
+        $this->assertSame(
+            1,
+            preg_match("/define(?:IfNotDefined)?\\('DB_TYPE', '([a-z]+)'\\)/", $config, $m),
+            'config.php から DB_TYPE を読めません'
+        );
 
         return $m[1];
     }

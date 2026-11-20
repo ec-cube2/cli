@@ -97,7 +97,12 @@ jobs:
       matrix:
         php: ['7.4', '8.1', '8.4']
         db: [pgsql, mysql]
-        eccube: [eccube-2.25.0]
+        # ec-cube2/ec-cube2 (EC-CUBE 本家のタグにインストール手順のパッチを当てたもの) のバージョン
+        eccube: ['2.25.0.1']
+        # EC-CUBE 本家の master (次のリリース) は ec-cube2/ec-cube2 に無いので、ref で git clone する
+        include:
+          - { php: '8.4', db: pgsql, eccube: master, ref: master }
+          - { php: '8.4', db: mysql, eccube: master, ref: master }
     services:
       postgres:
         image: postgres:16
@@ -123,7 +128,8 @@ jobs:
           --health-cmd "mysqladmin ping -h 127.0.0.1 -ppassword"
           --health-interval 5s --health-timeout 5s --health-retries 20
     env:
-      ECCUBE_REF: ${{ matrix.eccube }}
+      ECCUBE_VERSION: ${{ matrix.eccube }}
+      ECCUBE_REF: ${{ matrix.ref }}
       DBSERVER: 127.0.0.1
       DBPORT: ${{ matrix.db == 'pgsql' && '15432' || '13306' }}
       DBNAME: eccube_db
@@ -162,6 +168,150 @@ jobs:
           if [ -f build/testdox.txt ]; then
             {
               echo "### Integration: ${TITLE}"
+              echo
+              echo '```'
+              cat build/testdox.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload EC-CUBE logs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: eccube-logs-php${{ matrix.php }}-${{ matrix.db }}-${{ matrix.eccube }}
+          path: build/ec-cube/data/logs
+          if-no-files-found: ignore
+
+  # EC-CUBE 2.13 / 2.17 と古い PHP での確認。
+  # PHPUnit 8.5 / 9.6 は古い PHP では動かないので、テストは PHP 8.4 で実行し、CLI と EC-CUBE だけを
+  # matrix.php で動かす (IntegrationTestCase は環境変数 ECCUBE_PHP のコマンドで別プロセスを起動する)。
+  legacy:
+    name: Legacy (PHP ${{ matrix.php }} / ${{ matrix.db }} / EC-CUBE ${{ matrix.eccube }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # eccube は ec-cube2/ec-cube2 のバージョン (2.13.5.1 は本家 2.13.5-p2、2.17.2.1 は 2.17.2-p2 にパッチを当てたもの)。
+          # 2.13 は PHP 5.3〜5.6 向け。CLI は Symfony 3.4 以上が要るので PHP 5.5.9 以上になる。
+          # 2.13 は接続時に MySQL 5.7.5 で削除された storage_engine を設定するので MySQL 5.6 を使う。
+          # 2.13 の MDB2 は MySQL に ext/mysql で接続するが、setup-php の PHP 5.6 (ubuntu-24.04) には
+          # ext/mysql が無い。そのため 2.13 × MySQL は PHP 5.5 で確認する
+          # (PHP 5.6 × MySQL 5.6 は、ext/mysql を入れた Docker の php:5.6-cli で手元で確認した)。
+          # Composer 2.3 以降が生成する autoload は PHP 5.6 未満で動かないので、PHP 5.5 では Composer 2.2 LTS を使う
+          - { eccube: '2.13.5.1', php: '5.5', db: pgsql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: '2.13.5.1', php: '5.5', db: mysql, mysql: 'mysql:5.6', ext: 'mysql, mysqli', composer: '2.2' }
+          - { eccube: '2.13.5.1', php: '5.6', db: pgsql, mysql: 'mysql:5.6', ext: mysqli }
+          # 2.17 は PHP 5.4〜8.0 向け (EC-CUBE の CI と同じく MySQL 5.7)
+          - { eccube: '2.17.2.1', php: '5.6', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '5.6', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.1', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.1', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.4', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '7.4', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '8.0', db: pgsql, mysql: 'mysql:5.7', ext: mysqli }
+          - { eccube: '2.17.2.1', php: '8.0', db: mysql, mysql: 'mysql:5.7', ext: mysqli }
+    services:
+      postgres:
+        # 2.13 の MDB2 は PostgreSQL 12 で削除された pg_attrdef.adsrc を参照する
+        image: postgres:10
+        env:
+          POSTGRES_DB: eccube_db
+          POSTGRES_USER: eccube_db_user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U eccube_db_user"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      mysql:
+        image: ${{ matrix.mysql }}
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: eccube_db
+          MYSQL_USER: eccube_db_user
+          MYSQL_PASSWORD: password
+        ports:
+          - 13306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -ppassword"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      ECCUBE_VERSION: ${{ matrix.eccube }}
+      DBSERVER: 127.0.0.1
+      DBPORT: ${{ matrix.db == 'pgsql' && '15432' || '13306' }}
+      DBNAME: eccube_db
+      DBUSER: eccube_db_user
+      DBPASS: password
+      # 古い Symfony には未修正のセキュリティアドバイザリがあり、Composer 2.9 以降はインストールを拒否する
+      COMPOSER_NO_SECURITY_BLOCKING: '1'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP ${{ matrix.php }} (CLI と EC-CUBE 用)
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, gd, pgsql, zip, xml, ${{ matrix.ext }}
+          coverage: none
+          tools: none
+
+      - name: Record PHP ${{ matrix.php }}
+        run: |
+          php -v
+          {
+            echo "ECCUBE_PHP=$(readlink -f "$(command -v php)")"
+            echo "PLATFORM_PHP=$(php -r 'echo PHP_VERSION;')"
+          } >> "$GITHUB_ENV"
+
+      - name: Setup PHP 8.4 (PHPUnit と Composer 用)
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: '8.4'
+          extensions: mbstring, xml
+          coverage: none
+          tools: composer:${{ matrix.composer || 'v2' }}
+
+      # setup-php は、読み込まれていない拡張も Enabled と表示することがある (PHP 5.6 の mysql で起きた)
+      - name: Check PHP binaries
+        env:
+          EXTENSIONS: mbstring, gd, pgsql, zip, xml, ${{ matrix.ext }}
+        run: |
+          echo "PHPUnit: $(command -v php) ($(php -r 'echo PHP_VERSION;'))"
+          echo "CLI: ${ECCUBE_PHP} ($("$ECCUBE_PHP" -r 'echo PHP_VERSION;'))"
+          composer --version
+          missing=0
+          for ext in ${EXTENSIONS//,/ }; do
+            if ! "$ECCUBE_PHP" -r "exit(extension_loaded('$ext') ? 0 : 1);" 2>/dev/null; then
+              echo "::error::PHP ${{ matrix.php }} に拡張 $ext が読み込まれていません"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Install test dependencies
+        run: composer update --no-interaction --no-progress
+
+      - name: Setup EC-CUBE with ec-cube2/cli
+        env:
+          DB_TYPE: ${{ matrix.db }}
+        run: .github/scripts/setup-eccube.sh "$DB_TYPE"
+
+      - name: Run integration tests
+        run: vendor/bin/phpunit --testsuite integration --testdox-text build/testdox.txt
+
+      - name: Write test summary
+        if: always()
+        env:
+          TITLE: PHP ${{ matrix.php }} / ${{ matrix.db }} / ${{ matrix.eccube }}
+        run: |
+          if [ -f build/testdox.txt ]; then
+            {
+              echo "### Legacy: ${TITLE}"
               echo
               echo '```'
               cat build/testdox.txt

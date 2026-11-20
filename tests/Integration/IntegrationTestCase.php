@@ -9,8 +9,10 @@ use PHPUnit\Framework\TestCase;
  *
  * 前提:
  * - 環境変数 ECCUBE_ROOT に EC-CUBE のルートディレクトリ (data/ と html/ がある場所) を指定する。
- * - CLI は ECCUBE_ROOT/data/vendor/ec-cube2/cli にシンボリックリンクではなく実体としてインストールされている
- *   (Init::init() は自身の設置場所から vendor ディレクトリを推定するため)。
+ * - CLI は ECCUBE_ROOT/data/vendor/ec-cube2/cli (2.17 以降) か ECCUBE_ROOT/vendor/ec-cube2/cli (2.13) に、
+ *   シンボリックリンクではなく実体としてインストールされている (Init::init() は自身の設置場所から vendor ディレクトリを推定するため)。
+ * - 環境変数 ECCUBE_PHP を指定すると、CLI と EC-CUBE はそのコマンドで実行する (既定はテストを実行している PHP)。
+ *   テストは PHPUnit 8.5 / 9.6 が動く PHP で実行し、CLI だけを古い PHP で動かすために使う。
  * - DB は EC-CUBE の eccube_install.sh で初期化済み。
  *
  * セットアップは .github/scripts/setup-eccube.sh を参照。
@@ -38,6 +40,13 @@ abstract class IntegrationTestCase extends TestCase
 
     private static function cliBin(string $root): string
     {
+        foreach (['/data/vendor', '/vendor'] as $vendorDir) {
+            $bin = $root . $vendorDir . '/ec-cube2/cli/bin/eccube';
+            if (is_file($bin)) {
+                return $bin;
+            }
+        }
+
         return $root . '/data/vendor/ec-cube2/cli/bin/eccube';
     }
 
@@ -65,12 +74,19 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * PHP を起動するコマンド。
      *
+     * 環境変数 ECCUBE_PHP があればそれを使う (シェルのコマンドとしてそのまま展開する)。
+     *
      * PHP のエラー表示 (EC-CUBE の依存ライブラリが新しい PHP で出す Deprecated など) は標準エラー出力に回し、
      * 標準出力にはコマンドの出力だけが載るようにする。Fatal error も標準エラー出力に出る。
      */
     private static function php(): string
     {
-        return escapeshellarg(PHP_BINARY) . ' -d display_errors=stderr';
+        $php = getenv('ECCUBE_PHP');
+        if ($php === false || $php === '') {
+            $php = escapeshellarg(PHP_BINARY);
+        }
+
+        return $php . ' -d display_errors=stderr';
     }
 
     /**
@@ -146,8 +162,10 @@ abstract class IntegrationTestCase extends TestCase
      * SQL ファイルの文を ; で区切って順に実行する (テストの事前条件を CLI に頼らずに作るために使う)。
      *
      * MySQL では、EC-CUBE の eccube_install.sh と同じく予約語の rank をバッククォートで囲む。
+     *
+     * @param bool $ignoreErrors true ならエラーになった文を飛ばして続ける (drop_table.sql 用)
      */
-    protected function executeSqlFile(string $path)
+    protected function executeSqlFile(string $path, bool $ignoreErrors = false)
     {
         $result = $this->runEccubePhp(sprintf(
             '$conn = SC_Query_Ex::getSingletonInstance()->conn;'
@@ -155,10 +173,11 @@ abstract class IntegrationTestCase extends TestCase
             . 'if (DB_TYPE === "mysqli") { $all = str_replace("rank", "`rank`", $all); }'
             . 'foreach (explode(";", $all) as $sql) {'
             . '  if (trim($sql) === "") { continue; }'
-            . '  $r = $conn->query($sql);'
-            . '  if (PEAR::isError($r)) { fwrite(STDERR, $r->getMessage() . ": " . $sql . "\n"); exit(1); }'
+            . '  try { $r = $conn->query($sql); } catch (Exception $e) { $r = PEAR::raiseError($e->getMessage()); }'
+            . '  if (PEAR::isError($r) && !%s) { fwrite(STDERR, $r->getMessage() . ": " . $sql . "\n"); exit(1); }'
             . '}',
-            var_export($path, true)
+            var_export($path, true),
+            var_export($ignoreErrors, true)
         ));
 
         if ($result[0] !== 0) {

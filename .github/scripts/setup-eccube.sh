@@ -6,10 +6,24 @@
 #   .github/scripts/setup-eccube.sh <pgsql|mysql>
 #
 # 環境変数 (括弧内は既定値):
-#   ECCUBE_REF  取得する EC-CUBE のタグまたはブランチ (eccube-2.25.0)
+#   ECCUBE_VERSION
+#               composer create-project で取得する ec-cube2/ec-cube2 のバージョン (2.25.0.1)。
+#               ec-cube2/ec-cube2 は EC-CUBE 本家のタグにインストール手順のパッチを当てたもの
+#               (2.13.5.1 / 2.17.2.1 / 2.25.0.1 など。https://github.com/ec-cube2/ec-cube2)
+#   ECCUBE_REF  指定すると、ECCUBE_VERSION の代わりに EC-CUBE 本家 (EC-CUBE/ec-cube2) のこのブランチまたは
+#               タグを git clone する。本家の master など、ec-cube2/ec-cube2 に無いものを試すときに使う
+#               (EC-CUBE 2.17 以降のみ。2.13 の eccube_install.sh は別ホストの DB に入れられない)
+#   ECCUBE_REPOSITORY
+#               ECCUBE_VERSION の取得に使う Composer のリポジトリ (create-project の --repository に渡す)。
+#               公開前の ec-cube2/ec-cube2 のブランチを試すときに
+#               '{"type": "vcs", "url": "<ec-cube2/ec-cube2 のクローン>"}' と ECCUBE_VERSION=dev-<ブランチ> を指定する
 #   WORK_DIR    作業ディレクトリ (<CLI のルート>/build)。EC-CUBE は $WORK_DIR/ec-cube に置く
 #   DBSERVER / DBPORT / DBNAME / DBUSER / DBPASS
 #               EC-CUBE の eccube_install.sh にそのまま渡す DB 接続情報
+#   PLATFORM_PHP
+#               指定すると EC-CUBE の composer.json の config.platform.php をこの値にする。
+#               CLI を動かす PHP と Composer を動かす PHP が違うとき (古い PHP での確認) に、
+#               CLI を動かす PHP のバージョンを指定する
 #
 # 実行後、テストは ECCUBE_ROOT=$WORK_DIR/ec-cube を指定して実行する。
 # GitHub Actions 上では ECCUBE_ROOT を $GITHUB_ENV に書き出す。
@@ -28,7 +42,9 @@ case "$DB_TYPE" in
 esac
 
 CLI_DIR=$(cd "$(dirname "$0")/../.." && pwd)
-ECCUBE_REF=${ECCUBE_REF:-eccube-2.25.0}
+ECCUBE_VERSION=${ECCUBE_VERSION:-2.25.0.1}
+ECCUBE_REF=${ECCUBE_REF:-}
+ECCUBE_REPOSITORY=${ECCUBE_REPOSITORY:-}
 WORK_DIR=${WORK_DIR:-$CLI_DIR/build}
 ECCUBE_ROOT=$WORK_DIR/ec-cube
 CLI_SRC=$WORK_DIR/cli-src
@@ -38,11 +54,23 @@ CLI_VERSION=1.4.99
 
 mkdir -p "$WORK_DIR"
 
-echo "::group::EC-CUBE ${ECCUBE_REF} の取得"
-if [ ! -d "$ECCUBE_ROOT/.git" ]; then
+if [ -n "$ECCUBE_REF" ]; then
+    echo "::group::EC-CUBE ${ECCUBE_REF} の取得 (EC-CUBE/ec-cube2 を git clone)"
+else
+    echo "::group::EC-CUBE ${ECCUBE_VERSION} の取得 (ec-cube2/ec-cube2 を composer create-project)"
+fi
+if [ -f "$ECCUBE_ROOT/eccube_install.sh" ]; then
+    echo "取得済みの $ECCUBE_ROOT を使います"
+elif [ -n "$ECCUBE_REF" ]; then
     git clone --depth 1 --branch "$ECCUBE_REF" https://github.com/EC-CUBE/ec-cube2.git "$ECCUBE_ROOT"
 else
-    echo "取得済みの $ECCUBE_ROOT を使います"
+    # 依存パッケージは CLI を組み込むときに入れる (PLATFORM_PHP を反映させるため)。
+    # 2.13 の composer.json は php ^5.2 を要求するので、Composer を動かす PHP の版は確認しない
+    CREATE_PROJECT_ARGS=(--no-interaction --no-progress --no-install --ignore-platform-req=php)
+    if [ -n "$ECCUBE_REPOSITORY" ]; then
+        CREATE_PROJECT_ARGS+=(--repository="$ECCUBE_REPOSITORY")
+    fi
+    composer create-project "${CREATE_PROJECT_ARGS[@]}" "ec-cube2/ec-cube2:${ECCUBE_VERSION}" "$ECCUBE_ROOT"
 fi
 echo "::endgroup::"
 
@@ -61,10 +89,23 @@ echo "::endgroup::"
 
 echo "::group::EC-CUBE に CLI を組み込む"
 cd "$ECCUBE_ROOT"
+if [ -n "${PLATFORM_PHP:-}" ]; then
+    composer config platform.php "$PLATFORM_PHP"
+    # EC-CUBE の require-dev (テスト用) は CLI のテストに要らない。2.17 の composer.lock にある
+    # fzaninotto/faker や php5friends/phpunit48 は PHP 8 を許さないので、残すと PHP 8.0 で依存を解決できない
+    if [ -f composer.json ]; then
+        mapfile -t DEV_PACKAGES < <(jq -r '."require-dev" // {} | keys[]' composer.json)
+        if [ "${#DEV_PACKAGES[@]}" -gt 0 ]; then
+            composer remove --dev --no-update "${DEV_PACKAGES[@]}"
+        fi
+    fi
+fi
+# vendor の場所は 2.17 以降が data/vendor、2.13 がプロジェクト直下の vendor
+VENDOR_DIR=$(composer config vendor-dir)
 composer config repositories.cli-under-test \
     "{\"type\": \"path\", \"url\": \"${CLI_SRC}\", \"options\": {\"symlink\": false, \"versions\": {\"ec-cube2/cli\": \"${CLI_VERSION}\"}}}"
 # path リポジトリはソースが変わってもバージョンが同じだと入れ直さないため、既存のコピーを消してから入れる
-rm -rf data/vendor/ec-cube2/cli
+rm -rf "${VENDOR_DIR}/ec-cube2/cli"
 composer require --no-interaction --no-progress --update-with-all-dependencies "ec-cube2/cli:${CLI_VERSION}"
 composer show ec-cube2/cli symfony/console symfony/dependency-injection symfony/event-dispatcher symfony/config symfony/yaml 2>/dev/null \
     | grep -E '^(name|versions)' || true
