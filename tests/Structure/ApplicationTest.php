@@ -44,6 +44,7 @@ class ApplicationTest extends TestCase
         'module:list',
         'module:uninstall',
         'module:update',
+        'ownersstore:download',
         'ownersstore:list',
         'ownersstore:set-key',
         'parameter:get',

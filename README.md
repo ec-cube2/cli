@@ -59,6 +59,7 @@ Available commands:
   module:uninstall         モジュールアンインストール
   module:update            モジュールアップデート
  ownersstore
+  ownersstore:download     オーナーズストアからダウンロード
   ownersstore:list         オーナーズストア一覧
   ownersstore:set-key      オーナーズストア認証キー設定
  parameter
