@@ -186,6 +186,37 @@ abstract class IntegrationTestCase extends TestCase
     }
 
     /**
+     * ディレクトリの中のファイルを、別のディレクトリにコピーする (サブディレクトリは扱わない)。
+     */
+    protected static function copyDir(string $src, string $dst)
+    {
+        mkdir($dst, 0777, true);
+        foreach (scandir($src) as $name) {
+            if ($name !== '.' && $name !== '..') {
+                copy($src . '/' . $name, $dst . '/' . $name);
+            }
+        }
+    }
+
+    /**
+     * ディレクトリを中身ごと削除する。無ければ何もしない。
+     */
+    protected static function removeDir(string $dir)
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($it as $file) {
+            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+        }
+        rmdir($dir);
+    }
+
+    /**
      * EC-CUBE を読み込んだ別プロセスで PHP のコードを実行する。
      *
      * CLI と同じく SAFE を、テーブルが無い状態でも読み込めるよう INSTALL_FUNCTION を定義してから読み込む

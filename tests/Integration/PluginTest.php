@@ -24,44 +24,18 @@ class PluginTest extends IntegrationTestCase
     {
         parent::setUpBeforeClass();
 
-        self::removePluginDir();
+        self::removeDir(self::pluginDir());
         self::copyDir(__DIR__ . '/fixtures/plugin/' . self::CODE, self::pluginDir());
     }
 
     public static function tearDownAfterClass(): void
     {
-        self::removePluginDir();
+        self::removeDir(self::pluginDir());
     }
 
     private static function pluginDir(): string
     {
         return self::$eccubeRoot . '/data/downloads/plugin/' . self::CODE;
-    }
-
-    private static function removePluginDir()
-    {
-        $dir = self::pluginDir();
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($it as $file) {
-            $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
-        }
-        rmdir($dir);
-    }
-
-    private static function copyDir(string $src, string $dst)
-    {
-        mkdir($dst, 0777, true);
-        foreach (scandir($src) as $name) {
-            if ($name !== '.' && $name !== '..') {
-                copy($src . '/' . $name, $dst . '/' . $name);
-            }
-        }
     }
 
     /**

@@ -28,6 +28,7 @@
             <file>tests/Integration/BackupTest.php</file>
             <file>tests/Integration/ZipTest.php</file>
             <file>tests/Integration/OwnersStoreTest.php</file>
+            <file>tests/Integration/OwnersStorePluginTest.php</file>
             <file>tests/Integration/InstallTest.php</file>
         </testsuite>
     </testsuites>

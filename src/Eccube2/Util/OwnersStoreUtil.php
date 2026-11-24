@@ -25,6 +25,14 @@ class OwnersStoreUtil
             throw new \Exception('EC-CUBEのインストールされていません.');
         }
 
+        // 管理画面と同じく、HTTP_Request などのクラスを読み込む前にプラグインをロードしておく。
+        // SC_ClassAutoloader は、クラスのファイルを include する前にプラグインを初めてロードする。
+        // このとき、プラグインが同じファイルを require_once すると (mdl_paypal_express の
+        // data/module/HTTP/Request.php など)、続く include で "Cannot declare class HTTP_Request" になる。
+        // プラグインのロードには DB 接続が要る (SC_Query のインスタンスが無いと何もしない) ので、先に接続する。
+        \SC_Query_Ex::getSingletonInstance();
+        \SC_Helper_Plugin_Ex::getSingletonInstance(true);
+
         require_once CLASS_REALDIR . 'pages/upgrade/LC_Page_Upgrade_Base.php';
         $this->page = new \LC_Page_Upgrade_Base();
         require_once CLASS_REALDIR . 'pages/upgrade/LC_Page_Upgrade_Download.php';
