@@ -16,6 +16,9 @@ class OwnersStoreUtil
     /** @var \LC_Upgrade_Helper_Log */
     protected $objLog;
 
+    /** @var array|null */
+    protected $lastCopyLog;
+
     public function __construct()
     {
         if (!defined('ECCUBE_INSTALL')) {
@@ -65,89 +68,99 @@ class OwnersStoreUtil
         return $arrProducts;
     }
 
+    /**
+     * EC-CUBE 本体の最新パッチをダウンロードして適用する.
+     *
+     * @return object 配信サーバーが返した商品情報 (dl_file は空にしてある)
+     * @throws \Exception
+     */
     public function patchDownload()
     {
-        // 認証キーの取得
-        $public_key = $this->getPublicKey();
-        $sha1_key = $this->createSeed();
-
-        $arrPostData = array(
-            'eccube_url' => HTTP_URL,
-            'public_key' => sha1($public_key . $sha1_key),
-            'sha1_key'   => $sha1_key,
-            'patch_code' => 'latest'
-        );
-        list($objReq, $objData) = $this->request('patch_download', $arrPostData);
-
-        $exract_dir = $this->saveFile(base64_decode($objData->dl_file));
-
-        $this->update($objData, $exract_dir);
-
-        // 配信サーバーへ通知
-        $objReq = $this->notifyDownload($mode, $objReq->getResponseCookies());
-
-        $this->objLog->end();
-
-        return $objData;
+        return $this->downloadAndUpdate('patch_download', array(
+            'patch_code' => 'latest',
+        ));
     }
 
+    /**
+     * 自動アップデートが有効なモジュールをダウンロードして適用する.
+     *
+     * @param int $productId オーナーズストアの商品ID
+     * @return object 配信サーバーが返した商品情報 (dl_file は空にしてある)
+     * @throws \Exception
+     */
     public function autoDownload($productId)
     {
-        $objLog->log('* auto update check start');
-        if ($this->autoUpdateEnable($productId) !== true) {
-            $this->objLog->error(OSTORE_E_C_AUTOUP_DISABLE, $_POST);
+        $mode = 'auto_update';
+        $this->objLog->start($mode);
+
+        $this->objLog->log('* auto update check start');
+        if ($this->page->autoUpdateEnable($productId) !== true) {
+            $this->objLog->error(OSTORE_E_C_AUTOUP_DISABLE);
             $this->throwException(OSTORE_E_C_AUTOUP_DISABLE);
+        }
+
+        return $this->downloadAndUpdate($mode, array(
+            'product_id' => $productId,
+        ), false);
+    }
+
+    /**
+     * モジュール・プラグインをダウンロードして適用する.
+     *
+     * 管理画面のオーナーズストア「ダウンロード」と同じ処理 (LC_Page_Upgrade_Download).
+     *
+     * @param int $productId オーナーズストアの商品ID
+     * @return object 配信サーバーが返した商品情報 (dl_file は空にしてある)
+     * @throws \Exception
+     */
+    public function download($productId)
+    {
+        return $this->downloadAndUpdate('download', array(
+            'product_id' => $productId,
+        ));
+    }
+
+    /**
+     * 直前の download() / autoDownload() / patchDownload() でのファイルコピーの結果.
+     *
+     * @return array|null SC_Batch_Update::execute() の戻り値 (err / ok / buckup_path)
+     */
+    public function getLastCopyLog()
+    {
+        return $this->lastCopyLog;
+    }
+
+    /**
+     * @param string $mode 配信サーバーへのリクエストの mode
+     * @param array $arrParams 認証情報以外に送るパラメーター
+     * @param bool $startLog ログの開始を記録するか (呼び出し元で記録済みなら false)
+     * @return object
+     * @throws \Exception
+     */
+    protected function downloadAndUpdate($mode, array $arrParams, $startLog = true)
+    {
+        if ($startLog) {
+            $this->objLog->start($mode);
         }
 
         // 認証キーの取得
         $public_key = $this->getPublicKey();
         $sha1_key = $this->createSeed();
 
-        $arrPostData = array(
+        $arrPostData = array_merge(array(
             'eccube_url' => HTTP_URL,
             'public_key' => sha1($public_key . $sha1_key),
             'sha1_key'   => $sha1_key,
-            'product_id' => $productId,
-        );
-        list($objReq, $objData) = $this->request('auto_update', $arrPostData);
+        ), $arrParams);
+        list($objReq, $objData) = $this->request($mode, $arrPostData);
 
         $exract_dir = $this->saveFile(base64_decode($objData->dl_file));
+        $objData->dl_file = '';
 
         $this->update($objData, $exract_dir);
 
         // 配信サーバーへ通知
-        $objReq = $this->notifyDownload($mode, $objReq->getResponseCookies());
-
-        $this->objLog->end();
-
-        return $objData;
-    }
-
-    /**
-     * @param $productId
-     * @return object
-     * @throws \Exception
-     */
-    public function download($productId)
-    {
-        // 認証キーの取得
-        $public_key = $this->getPublicKey();
-        $sha1_key = $this->createSeed();
-
-        $arrPostData = array(
-            'eccube_url' => HTTP_URL,
-            'public_key' => sha1($public_key . $sha1_key),
-            'sha1_key'   => $sha1_key,
-            'product_id' => $productId
-        );
-        list($objReq, $objData) = $this->request('download', $arrPostData);
-
-        $exract_dir = $this->saveFile(base64_decode($objData->dl_file));
-
-        $this->update($objData, $exract_dir);
-
-        // 配信サーバーへ通知
-        $objReq = $this->notifyDownload($mode, $objReq->getResponseCookies());
+        $this->notifyDownload($mode, $objReq->getResponseCookies());
 
         $this->objLog->end();
 
@@ -165,6 +178,7 @@ class OwnersStoreUtil
         @include_once CLASS_REALDIR . 'batch/SC_Batch_Update.php';
         $objBatch = new \SC_Batch_Update();
         $arrCopyLog = $objBatch->execute($exract_dir);
+        $this->lastCopyLog = $arrCopyLog;
 
         $this->objLog->log('* copy batch check start');
         if (count($arrCopyLog['err']) > 0) {
@@ -172,7 +186,7 @@ class OwnersStoreUtil
             $this->pageDownload->updateMdlTable($objData);
 
             $this->objLog->error(OSTORE_E_C_BATCH_ERR, $arrCopyLog);
-            $this->throwException(OSTORE_E_C_BATCH_ERR);
+            $this->throwException(OSTORE_E_C_BATCH_ERR, $arrCopyLog['err']);
         }
 
         // dtb_module_update_logの更新
@@ -201,7 +215,7 @@ class OwnersStoreUtil
         $dir  = DATA_REALDIR . 'downloads/tmp/';
         $filename = $time . '.tar.gz';
 
-        $this->objLog->log("* open ${filename} start");
+        $this->objLog->log("* open {$filename} start");
         if ($fp = @fopen($dir . $filename, 'w')) {
             @fwrite($fp, $data);
             @fclose($fp);
@@ -212,13 +226,13 @@ class OwnersStoreUtil
 
         // ダウンロードアーカイブを展開する
         $exract_dir = $dir . $time;
-        $this->objLog->log("* mkdir ${exract_dir} start");
+        $this->objLog->log("* mkdir {$exract_dir} start");
         if (!@mkdir($exract_dir)) {
             $this->objLog->error(OSTORE_E_C_PERMISSION, $exract_dir);
             $this->throwException(OSTORE_E_C_PERMISSION);
         }
 
-        $this->objLog->log("* extract ${dir}${filename} start");
+        $this->objLog->log("* extract {$dir}{$filename} start");
         $tar = new \Archive_Tar($dir . $filename);
         $tar->extract($exract_dir);
 
@@ -312,12 +326,20 @@ class OwnersStoreUtil
         return $this->page->createSeed();
     }
 
-    public function throwException($errCode)
+    /**
+     * @param int $errCode
+     * @param string[] $arrDetails メッセージに追記する詳細 (コピーに失敗したファイルなど)
+     * @throws \Exception
+     */
+    public function throwException($errCode, array $arrDetails = array())
     {
         $objJson = new \LC_Upgrade_Helper_Json();
         $objJson->setError($errCode);
 
         $message = preg_replace('|<br\s*/?>|', "\n", $objJson->arrData['msg']);
+        if (!empty($arrDetails)) {
+            $message .= "\n" . implode("\n", $arrDetails);
+        }
 
         throw new \Exception($message, $objJson->arrData['errcode']);
     }

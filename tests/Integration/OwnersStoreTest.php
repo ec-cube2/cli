@@ -5,7 +5,7 @@ namespace Eccube2\Tests\Integration;
 /**
  * オーナーズストアとモジュールのうち、外部と通信しないコマンド。
  *
- * ownersstore:list と module:install / module:update はオーナーズストアと通信するため、CI では実行しない。
+ * ownersstore:list / ownersstore:download はオーナーズストアと通信するため、CI では通信する前に失敗する場合だけを確かめる。
  */
 class OwnersStoreTest extends IntegrationTestCase
 {
@@ -32,6 +32,14 @@ class OwnersStoreTest extends IntegrationTestCase
     {
         $result = $this->eccube(['module:info', 'NoSuchModule']);
 
+        $this->assertCommandFailed($result);
+    }
+
+    public function testDownloadWithInvalidProductIdFails()
+    {
+        $result = $this->eccube(['ownersstore:download', 'abc']);
+
+        $this->assertStringContainsString('商品ID は数字で指定してください', $result->stdout, $result->describe());
         $this->assertCommandFailed($result);
     }
 }
