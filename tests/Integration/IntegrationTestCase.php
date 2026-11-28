@@ -19,11 +19,25 @@ use PHPUnit\Framework\TestCase;
  *
  * EC-CUBE はグローバルな定数と状態を持つため、同じプロセスでは 1 回しか初期化できない。
  * そのためコマンドは毎回別プロセスで実行し、終了コードと出力で結果を確認する。
+ *
+ * 環境変数 ECCUBE_RESTRICTED_PERMISSIONS=1 のときは、Web サーバーの書き込み権限を絞った環境
+ * (.github/docker/restricted/、ec-cube2/cli#20) で実行しているものとして、CLI を実行するたびに権限の問題が
+ * 起きていないかを確かめる。問題があったテストと、失敗したテストは、未完了 (incomplete) として記録する。
+ * この環境で動かないコマンドを一覧にするためで、CLI の不具合そのものは通常の結合テストで確かめる。
+ * CLI (Init::setErrorHandler()) は E_WARNING を表示しないので、ファイルを書けなくても出力には何も出ないことが多い。
+ * 権限の問題は、主に各テストの結果の確認 (ファイルが更新されたか) と、所有者・トップページの確認で見つける。
  */
 abstract class IntegrationTestCase extends TestCase
 {
     /** @var string */
     protected static $eccubeRoot;
+
+    /**
+     * このテストで CLI を実行したときに見つかった権限の問題。
+     *
+     * @var string[]
+     */
+    private $permissionProblems = [];
 
     public static function setUpBeforeClass(): void
     {
@@ -67,8 +81,220 @@ abstract class IntegrationTestCase extends TestCase
         }
 
         list($exitCode, $stdout, $stderr) = self::runProcess($command, (string) $stdin);
+        $result = new CommandResult($args, $exitCode, $stdout, $stderr);
 
-        return new CommandResult($args, $exitCode, $stdout, $stderr);
+        if (self::isRestrictedPermissions()) {
+            foreach ($this->findPermissionProblems($result) as $problem) {
+                $this->permissionProblems[] = 'eccube ' . implode(' ', $args) . ': ' . $problem;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Web サーバーの書き込み権限を絞った環境で実行しているか (ECCUBE_RESTRICTED_PERMISSIONS=1)。
+     */
+    protected static function isRestrictedPermissions(): bool
+    {
+        return getenv('ECCUBE_RESTRICTED_PERMISSIONS') === '1';
+    }
+
+    /**
+     * Web サーバーが書き込めるディレクトリ (ECCUBE_ROOT からの相対パス。環境変数 ECCUBE_WRITABLE_DIRS)。
+     *
+     * @return string[]
+     */
+    protected static function writableDirs(): array
+    {
+        return preg_split('/\s+/', trim((string) getenv('ECCUBE_WRITABLE_DIRS')), -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+    /**
+     * テストは通ったが、CLI の実行で権限の問題が起きていた場合は未完了にする。
+     */
+    protected function assertPostConditions(): void
+    {
+        if ($this->permissionProblems !== []) {
+            $this->markTestIncomplete($this->describePermissionProblems());
+        }
+    }
+
+    /**
+     * 権限を絞った環境でのテストの失敗は、未完了に置き換える (この環境で動かないものを一覧にするため)。
+     *
+     * 通常の結合テストで通ることを前提に、この環境で失敗したものは権限が原因とみなす。
+     */
+    protected function onNotSuccessfulTest(\Throwable $t): void
+    {
+        if (self::isRestrictedPermissions()
+            && !$t instanceof \PHPUnit\Framework\IncompleteTest
+            && !$t instanceof \PHPUnit\Framework\SkippedTest) {
+            $message = 'Web サーバーの書き込み権限を絞った環境で失敗しました';
+            if ($this->permissionProblems !== []) {
+                $message = $this->describePermissionProblems();
+            }
+            $this->markTestIncomplete($message . "\n\n--- テストの失敗 ---\n" . $t->getMessage());
+        }
+
+        parent::onNotSuccessfulTest($t);
+    }
+
+    private function describePermissionProblems(): string
+    {
+        return "Web サーバーの書き込み権限を絞った環境で問題が起きました:\n- "
+            . implode("\n- ", array_unique($this->permissionProblems));
+    }
+
+    /**
+     * 所有者が想定と違うファイルのうち、報告済みのもの (後続のテストで同じものを何度も報告しないため)。
+     *
+     * @var array<string, true>
+     */
+    private static $reportedOwnershipProblems = [];
+
+    /** @var bool 直前の確認で、トップページを表示できなかったか */
+    private static $webWasBroken = false;
+
+    /**
+     * CLI を実行した後に、権限の問題が起きていないかを確かめる。
+     *
+     * - 出力に、権限が無いことによるエラーが出ていない (EC-CUBE のエラーハンドラーは警告を標準出力に出す)。
+     *   ただし data/logs/ に書けないことによる警告は、どのコマンドでも出る既知の問題なので
+     *   RestrictedPermissionsTest で別に記録し、ここでは数えない。
+     * - Web サーバーが書き込めるディレクトリの中は Web サーバーの所有、ほかは SSH ユーザーの所有のまま。
+     *   ほかの場所に、誰でも書き込めるファイルができていない。
+     * - Web サーバーがトップページを表示できる (CLI が書き換えたファイルを Web 側で読める)。
+     *
+     * @return string[]
+     */
+    private function findPermissionProblems(CommandResult $result): array
+    {
+        $problems = [];
+
+        foreach (preg_split('/\R/', $result->output()) as $line) {
+            if (preg_match('/Permission denied|[Ff]ailed to open stream|Operation not permitted|Read-only file system/', $line)
+                && strpos($line, '/data/logs/') === false) {
+                $problems[] = '出力: ' . trim(strip_tags($line));
+            }
+        }
+
+        $newOwnershipProblems = [];
+        foreach (self::findOwnershipProblems() as $problem) {
+            if (!isset(self::$reportedOwnershipProblems[$problem])) {
+                self::$reportedOwnershipProblems[$problem] = true;
+                $newOwnershipProblems[] = $problem;
+            }
+        }
+        // バックアップのように 1 回で多くのファイルを作るコマンドがあるので、最初の 5 件だけを出す
+        foreach (array_slice($newOwnershipProblems, 0, 5) as $problem) {
+            $problems[] = '所有者: ' . $problem;
+        }
+        if (count($newOwnershipProblems) > 5) {
+            $problems[] = sprintf('所有者: ほか %d 件', count($newOwnershipProblems) - 5);
+        }
+
+        if (!$this->checksWebPage()) {
+            return $problems;
+        }
+        $webProblem = self::findWebProblem();
+        if ($webProblem !== null && !self::$webWasBroken) {
+            $problems[] = 'Web: ' . $webProblem;
+        }
+        self::$webWasBroken = $webProblem !== null;
+
+        return $problems;
+    }
+
+    /**
+     * CLI を実行した後に、Web サーバーでトップページを表示できるかを確かめるか。
+     *
+     * DB を作り直すテストのように、途中でトップページを表示できなくなるのが正しいものでは false にする。
+     */
+    protected function checksWebPage(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @return string[] 所有者か mode が想定と違うファイル
+     */
+    protected static function findOwnershipProblems(): array
+    {
+        $root = self::$eccubeRoot;
+        $siteUid = (int) getenv('ECCUBE_SITE_UID');
+        $writable = [];
+        foreach (self::writableDirs() as $dir) {
+            // 書き込み用ディレクトリの中は、そのディレクトリと同じ所有者 (restrict-permissions.sh が Web サーバーにしている)
+            $writable[$dir] = fileowner($root . '/' . $dir);
+        }
+
+        $problems = [];
+        $it = new \RecursiveIteratorIterator(
+            new \RecursiveCallbackFilterIterator(
+                new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
+                function (\SplFileInfo $file) use ($root) {
+                    // Composer の vendor は CLI が書き換えない。数が多いので見ない
+                    $relative = substr($file->getPathname(), strlen($root) + 1);
+
+                    return $relative !== 'data/vendor' && $relative !== 'vendor';
+                }
+            ),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+        foreach ($it as $file) {
+            /** @var \SplFileInfo $file */
+            if ($file->isLink()) {
+                continue;
+            }
+            $relative = substr($file->getPathname(), strlen($root) + 1);
+            $expected = $siteUid;
+            $inWritable = false;
+            foreach ($writable as $dir => $uid) {
+                if ($relative === $dir || strpos($relative, $dir . '/') === 0) {
+                    $expected = $uid;
+                    $inWritable = true;
+                    break;
+                }
+            }
+            if ($file->getOwner() !== $expected) {
+                $problems[] = sprintf('%s (uid %d。想定は uid %d)', $relative, $file->getOwner(), $expected);
+            } elseif (!$inWritable && ($file->getPerms() & 0002) !== 0) {
+                $problems[] = sprintf('%s (誰でも書き込める: %o)', $relative, $file->getPerms() & 0777);
+            }
+        }
+
+        return $problems;
+    }
+
+    /**
+     * Web サーバーでトップページを表示できるかを確かめる (環境変数 ECCUBE_WEB_URL)。
+     *
+     * @return string|null 表示できないときはその理由
+     */
+    protected static function findWebProblem()
+    {
+        $url = (string) getenv('ECCUBE_WEB_URL');
+        $context = stream_context_create(['http' => ['ignore_errors' => true, 'timeout' => 30]]);
+        $body = @file_get_contents($url, false, $context);
+        if ($body === false) {
+            return $url . ' に接続できません';
+        }
+        // リダイレクトされたときは、それぞれの応答のヘッダーが続けて入るので、最後のステータス行を見る
+        $status = '';
+        foreach ($http_response_header as $header) {
+            if (strpos($header, 'HTTP/') === 0) {
+                $status = $header;
+            }
+        }
+        if (!preg_match('#^HTTP/\S+ 200#', $status)) {
+            return $url . ': ' . $status;
+        }
+        if (stripos($body, '</html>') === false) {
+            return $url . ': ページの最後まで出力されていません' . "\n" . substr($body, -500);
+        }
+
+        return null;
     }
 
     /**
@@ -224,7 +450,7 @@ abstract class IntegrationTestCase extends TestCase
      *
      * @return array{0: int, 1: string, 2: string} 終了コード, 標準出力, 標準エラー出力
      */
-    private function runEccubePhp(string $code): array
+    protected function runEccubePhp(string $code): array
     {
         $script = 'define("SAFE", true); define("INSTALL_FUNCTION", true); '
             . 'require ' . var_export(self::$eccubeRoot . '/html/require.php', true) . '; ' . $code;

@@ -27,6 +27,12 @@ WORK_DIR=$PWD/build/213 ECCUBE_VERSION=2.13.5.1 PLATFORM_PHP=5.6.40 \
 ECCUBE_PHP=/usr/bin/php5.6 ECCUBE_ROOT=$PWD/build/213/ec-cube vendor/bin/phpunit --testsuite integration
 ```
 
+```bash
+# Web サーバーの書き込み権限を絞った環境での結合テスト (Docker。#20)。setup-eccube.sh の後に実行する
+PHP_VERSION=8.4 .github/docker/restricted/run.sh --testdox-text build/testdox.txt
+.github/docker/restricted/run.sh down   # setup-eccube.sh のやり直しや build/ の削除の前に必ず実行する
+```
+
 - 結合テストは DB を作り直すので、再実行時は `setup-eccube.sh` からやり直す。2 回目以降の `setup-eccube.sh` は EC-CUBE の取得を省略し、CLI の再コピー・組み込みと DB 初期化だけを行う。
 - `setup-eccube.sh` は未コミットの変更も含めて git 管理下のファイルだけを `build/cli-src` にコピーし、path リポジトリ (`symlink: false`、バージョン `1.4.99` を名乗らせる) として組み込む。シンボリックリンクにすると `Init::init()` が `realpath` で vendor を推定できず、CLI 側の `vendor/` が混ざると EC-CUBE の autoload より先に読まれてしまうため。
 - EC-CUBE の取得方法 (詳細は `setup-eccube.sh` の冒頭):
@@ -46,6 +52,14 @@ ECCUBE_PHP=/usr/bin/php5.6 ECCUBE_ROOT=$PWD/build/213/ec-cube vendor/bin/phpunit
   - setup-php は、実際には読み込まれていない拡張も「Enabled」と表示することがある (PHP 5.6 の ext/mysql)。そのため `Check PHP binaries` で `extension_loaded()` を確認している。
   - PHP 5.5 では Composer 2.2 LTS を使う (2.3 以降が生成する autoload は PHP 5.6 未満で動かない)。
   - サービスコンテナの MySQL は起動引数を渡せないので、文字コードはサーバーの既定 (MySQL 5.6 は latin1) になる。
+- `restricted-permissions`: Web サーバーの書き込み権限を絞った環境で CLI が動くか (#20)。EC-CUBE 2.25.0.1 × PHP 8.4 × PostgreSQL 16 / MySQL 8.4 と、2.17.2.1 × PHP 7.4 × PostgreSQL 10。
+  - EC-CUBE の取得と DB の初期化は runner の `setup-eccube.sh` で行い、`.github/docker/restricted/run.sh` が `php:<ver>-apache` のコンテナ (`network_mode: host`、checkout をホストと同じパスでマウント) の中で、root で `restrict-permissions.sh`、`www-data` で Apache、`site` (uid はホストのユーザーと同じ) で PHPUnit を動かす。
+  - 権限モデル: docroot は `site` 所有の `u=rwX,g=rX,o=rX`。`www-data` が書き込めるのは `ECCUBE_WRITABLE_DIRS` (`run.sh` で定義) の 5 つのディレクトリだけ。
+  - `vendor/` は runner の Composer で解決したものをコンテナでそのまま使うので、runner の PHP とコンテナの PHP (`PHP_VERSION`) を揃える。`PLATFORM_PHP` も記録している (2.17 の `config.platform.php` が 5.4.16 のため)。
+  - 環境変数 `ECCUBE_RESTRICTED_PERMISSIONS=1` のとき、`IntegrationTestCase::eccube()` は実行のたびに、出力の権限エラー (`data/logs/` の警告は除く)、所有者と mode (`www-data` が書き換えられる o+w のファイルも問題にする)、トップページの表示 (`ECCUBE_WEB_URL`。`InstallTest` は `checksWebPage()` で外している) を確かめる。問題があったテストと、この環境で失敗したテストは incomplete に置き換えるので、ジョブは緑のまま、この環境で動かないものが testdox に一覧として出る (理由は `--verbose` で出る)。CLI の不具合そのものは `integration` ジョブで確かめる。
+  - **CLI は権限エラーを出力しない。** `Init::setErrorHandler()` は E_ERROR / E_USER_ERROR 以外を握りつぶすので、ファイルを書けなくてもコマンドは `[OK]` で終わる (`parameter:set` はキャッシュが古いまま成功する)。そのため、テストではコマンドの結果のファイル (`mtb_constants.php`、`data/cache/*.serial`、`templates_c`) を確かめる。EC-CUBE 本体のエラーハンドラーは警告を HTML で標準出力に出す (`runEccubePhp()` のとき)。
+  - `data/logs/` に書けないことは `RestrictedPermissionsTest::testLogging` で 1 か所だけ記録する。`RestrictedPermissionsTest` は CLI を実行する前の状態 (権限の前提とトップページ) を確かめるので、結合テストの最初に置いている。
+  - 権限を揃えた後の `build/ec-cube` には `www-data` (uid 33) 所有のファイルが残り、ホストのユーザーでは消せない。手元では `run.sh down` で所有者を戻す。
 
 ## アーキテクチャ
 

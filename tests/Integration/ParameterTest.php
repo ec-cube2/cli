@@ -37,6 +37,16 @@ class ParameterTest extends IntegrationTestCase
 
         $rows = $this->query('SELECT name FROM mtb_constants WHERE id = ?', [self::KEY]);
         $this->assertSame('25', $rows[0]['name'], 'mtb_constants が更新されていません' . "\n" . $result->describe());
+        // Web 側はキャッシュ (data/cache/mtb_constants.php) から定数を読むので、キャッシュにも反映されている必要がある。
+        // CLI は E_WARNING を表示しないので、キャッシュを書けなくてもコマンドは成功する。ファイルで確かめる
+        // 書式は EC-CUBE の版で違う (2.25.0 までは define('KEY', 値);、本家 master は SC_Initial_Ex::defineIfNotDefined('KEY', 値);)
+        $cache = (string) @file_get_contents(self::$eccubeRoot . '/data/cache/mtb_constants.php');
+        preg_match("/^(?:define|\\w+::defineIfNotDefined)\\('" . self::KEY . "', (.*)\\);$/m", $cache, $m);
+        $this->assertSame(
+            '25',
+            isset($m[1]) ? $m[1] : null,
+            'パラメーターキャッシュが更新されていません' . "\n" . $result->describe()
+        );
         $this->assertCommandSucceeded($result);
     }
 }

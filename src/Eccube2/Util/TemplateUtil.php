@@ -106,7 +106,8 @@ class TemplateUtil
      */
     public function clearCache($code)
     {
-        $templatesCDir = realpath(COMPILE_REALDIR . '../'). $code. '/';
+        // realpath() は末尾の / を落とすので、区切りを足す
+        $templatesCDir = realpath(COMPILE_REALDIR . '../') . '/' . $code . '/';
 
         if (\SC_Helper_FileManager_Ex::deleteFile($templatesCDir) === false) {
             return false;
