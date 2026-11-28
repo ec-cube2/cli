@@ -1,0 +1,25 @@
+# run.sh から使う。変数は run.sh が設定する。
+services:
+  web:
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${PHP_VERSION}
+        SITE_UID: ${SITE_UID}
+    image: ec-cube2-cli-restricted:${PHP_VERSION}-${SITE_UID}
+    # DB (GitHub Actions のサービスコンテナや手元の DB コンテナ) に、ホストと同じアドレスとポートで繋ぐ
+    network_mode: host
+    # パスをホストと揃える (EC-CUBE と CLI は自身の場所からパスを求めるので、テストが組み立てるパスと一致させる)
+    volumes:
+      - ${CLI_DIR}:${CLI_DIR}
+      - ${ECCUBE_ROOT}:${ECCUBE_ROOT}
+    working_dir: ${CLI_DIR}
+    environment:
+      APACHE_DOCUMENT_ROOT: ${ECCUBE_ROOT}/html
+      APACHE_PORT: ${WEB_PORT}
+      ECCUBE_ROOT: ${ECCUBE_ROOT}
+      ECCUBE_RESTRICTED_PERMISSIONS: '1'
+      ECCUBE_WRITABLE_DIRS: ${ECCUBE_WRITABLE_DIRS}
+      ECCUBE_SITE_UID: ${SITE_UID}
+      # EC-CUBE は HTTP_URL (eccube_install.sh の既定は http://localhost:8000/) と違うホストへのアクセスを転送するので、合わせる
+      ECCUBE_WEB_URL: http://localhost:${WEB_PORT}/

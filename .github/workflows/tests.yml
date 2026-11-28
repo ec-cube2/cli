@@ -326,3 +326,109 @@ jobs:
           name: eccube-logs-php${{ matrix.php }}-${{ matrix.db }}-${{ matrix.eccube }}
           path: build/ec-cube/data/logs
           if-no-files-found: ignore
+
+  # Web サーバーの書き込み権限を絞った環境で、CLI が動くかを確かめる (ec-cube2/cli#20)。
+  # docroot は SSH ユーザー (site) の所有にし、Web サーバー (www-data) が書き込めるのは
+  # html/upload・data/Smarty/templates_c・data/cache・data/upload・data/logs だけにする。
+  # EC-CUBE の取得と DB の初期化は runner で行い、権限の適用・Apache・PHPUnit はコンテナの中で動かす
+  # (.github/docker/restricted/run.sh)。この環境で動かないものは失敗ではなく未完了 (incomplete) として記録する。
+  restricted-permissions:
+    name: Restricted permissions (PHP ${{ matrix.php }} / ${{ matrix.db }} / EC-CUBE ${{ matrix.eccube }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { eccube: '2.25.0.1', php: '8.4', db: pgsql, postgres: 'postgres:16' }
+          - { eccube: '2.25.0.1', php: '8.4', db: mysql, postgres: 'postgres:16' }
+          # Web サーバーにソースコードへの書き込み権限が無いステージング環境 (#20) と同じ組み合わせ。
+          # 2.17 は legacy ジョブと同じく PostgreSQL 10 で確かめる
+          - { eccube: '2.17.2.1', php: '7.4', db: pgsql, postgres: 'postgres:10' }
+    services:
+      postgres:
+        image: ${{ matrix.postgres }}
+        env:
+          POSTGRES_DB: eccube_db
+          POSTGRES_USER: eccube_db_user
+          POSTGRES_PASSWORD: password
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd "pg_isready -U eccube_db_user"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: eccube_db
+          MYSQL_USER: eccube_db_user
+          MYSQL_PASSWORD: password
+        ports:
+          - 13306:3306
+        options: >-
+          --health-cmd "mysqladmin ping -h 127.0.0.1 -ppassword"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      ECCUBE_VERSION: ${{ matrix.eccube }}
+      DBSERVER: 127.0.0.1
+      DBPORT: ${{ matrix.db == 'pgsql' && '15432' || '13306' }}
+      DBNAME: eccube_db
+      DBUSER: eccube_db_user
+      DBPASS: password
+      # コンテナの PHP の版 (runner の PHP と揃える)
+      PHP_VERSION: ${{ matrix.php }}
+      # 2.17 の依存パッケージには未修正のセキュリティアドバイザリがあり、Composer 2.9 以降はインストールを拒否する
+      COMPOSER_NO_SECURITY_BLOCKING: ${{ matrix.eccube == '2.17.2.1' && '1' || '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # vendor/ (PHPUnit と EC-CUBE の依存パッケージ) は runner の Composer で解決し、コンテナの PHP でそのまま使う。
+      # そのため runner の PHP をコンテナと同じ版にする
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mbstring, gd, pgsql, mysqli, zip, xml
+          coverage: none
+          tools: composer:v2
+
+      # EC-CUBE の依存パッケージをこの PHP の版で解決する (2.17 の config.platform.php は 5.4.16)
+      - name: Record PHP version
+        run: echo "PLATFORM_PHP=$(php -r 'echo PHP_VERSION;')" >> "$GITHUB_ENV"
+
+      - name: Install test dependencies
+        run: composer update --no-interaction --no-progress
+
+      - name: Setup EC-CUBE with ec-cube2/cli
+        env:
+          DB_TYPE: ${{ matrix.db }}
+        run: .github/scripts/setup-eccube.sh "$DB_TYPE"
+
+      - name: Run integration tests (restricted permissions)
+        run: .github/docker/restricted/run.sh --testdox-text build/testdox.txt
+
+      - name: Write test summary
+        if: always()
+        env:
+          TITLE: PHP ${{ matrix.php }} / ${{ matrix.db }} / ${{ matrix.eccube }}
+        run: |
+          if [ -f build/testdox.txt ]; then
+            {
+              echo "### Restricted permissions: ${TITLE}"
+              echo
+              echo '```'
+              cat build/testdox.txt
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload EC-CUBE logs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: eccube-logs-restricted-php${{ matrix.php }}-${{ matrix.db }}-${{ matrix.eccube }}
+          path: build/ec-cube/data/logs
+          if-no-files-found: ignore

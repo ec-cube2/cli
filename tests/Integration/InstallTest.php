@@ -16,6 +16,14 @@ namespace Eccube2\Tests\Integration;
 class InstallTest extends IntegrationTestCase
 {
     /**
+     * テーブルを消している間はトップページを表示できないのが正しいので、権限を絞った環境でも確かめない。
+     */
+    protected function checksWebPage(): bool
+    {
+        return false;
+    }
+
+    /**
      * テーブルが存在すれば true。
      */
     private function tableExists(string $table): bool

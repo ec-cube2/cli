@@ -15,8 +15,11 @@
             EC-CUBE 2 に組み込んだ CLI を別プロセスで実行するテスト。
             環境変数 ECCUBE_ROOT に EC-CUBE のルートディレクトリを指定する (未指定ならスキップ)。
             DB を作り直すテストを最後に実行するため、ファイルを順番に列挙している。
+            RestrictedPermissionsTest は CLI を実行する前の状態を確かめるので最初に置く
+            (ECCUBE_RESTRICTED_PERMISSIONS=1 のときだけ実行される)。
         -->
         <testsuite name="integration">
+            <file>tests/Integration/RestrictedPermissionsTest.php</file>
             <file>tests/Integration/ApplicationTest.php</file>
             <file>tests/Integration/InfoTest.php</file>
             <file>tests/Integration/UtilTest.php</file>
