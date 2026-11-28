@@ -10,7 +10,14 @@ FROM php:${PHP_VERSION}-apache
 
 ARG SITE_UID=1000
 
+# php:7.4-apache は Debian 11 (bullseye)。bullseye のパッケージは deb.debian.org から消えている (404 になる) ので、
+# archive.debian.org を使う
 RUN set -eux; \
+    . /etc/os-release; \
+    if [ "$VERSION_CODENAME" = bullseye ]; then \
+        printf 'deb http://archive.debian.org/debian bullseye main\ndeb http://archive.debian.org/debian-security bullseye-security main\n' \
+            > /etc/apt/sources.list; \
+    fi; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
         libpq-dev libpng-dev libjpeg-dev libfreetype6-dev libzip-dev; \

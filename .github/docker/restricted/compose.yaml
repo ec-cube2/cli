@@ -15,6 +15,9 @@ services:
       - ${ECCUBE_ROOT}:${ECCUBE_ROOT}
     working_dir: ${CLI_DIR}
     environment:
+      # ロケールが C のままだと、PHP 7.4 の escapeshellarg() がマルチバイト文字を落とす (テストが CLI に渡す日本語の引数が欠ける)。
+      # GitHub Actions の runner と同じにする
+      LANG: C.UTF-8
       APACHE_DOCUMENT_ROOT: ${ECCUBE_ROOT}/html
       APACHE_PORT: ${WEB_PORT}
       ECCUBE_ROOT: ${ECCUBE_ROOT}

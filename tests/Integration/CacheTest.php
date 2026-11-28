@@ -54,10 +54,13 @@ class CacheTest extends IntegrationTestCase
         $root = self::$eccubeRoot;
         $this->assertSame([], self::filesOlderThan($start, glob($root . '/data/cache/mtb_*.serial')), 'マスターデータのキャッシュが残っています' . "\n" . $result->describe());
 
+        // コンパイル済みファイルは templates_c/<テンプレートのコード>/ の中にできる。
+        // 直下のファイル (.gitkeep や、2.13 が同梱している dummy) は数えない
+        $templatesC = $root . '/data/Smarty/templates_c';
         $compiled = [];
-        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root . '/data/Smarty/templates_c', \FilesystemIterator::SKIP_DOTS));
+        $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($templatesC, \FilesystemIterator::SKIP_DOTS));
         foreach ($it as $file) {
-            if ($file->isFile() && $file->getFilename() !== '.gitkeep') {
+            if ($file->isFile() && $file->getPath() !== $templatesC) {
                 $compiled[] = $file->getPathname();
             }
         }
